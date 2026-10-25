@@ -1,7 +1,17 @@
-import { Group, ListChecks, Trash } from "lucide-react";
+import { Group, ListChecks } from "lucide-react";
 import "./App.css";
+import { useState } from "react";
+import RuleOptions from "./RuleOptions";
+import type { Rule } from "./types";
 
 function App() {
+  // Temporary single rule until the group/reducer state exists
+  const [rule, setRule] = useState<Rule>({
+    fieldName: "name",
+    operation: "EQUAL",
+    value: "",
+  });
+
   return (
     <div className="flex h-screen items-center justify-center">
       <div className="w-200 border p-4">
@@ -11,7 +21,7 @@ function App() {
             Add Rule
           </button>
           <button className="btn">
-            <Group />
+            <Group size={16} />
             Add Group
           </button>
         </div>
@@ -20,38 +30,7 @@ function App() {
             <option>AND</option>
             <option>OR</option>
           </select>
-          <div className="flex gap-2">
-            <label className="floating-label">
-              <select className="select w-fit min-w-40">
-                <option disabled selected>
-                  Placeholder
-                </option>
-                <option>Option</option>
-              </select>
-              <span>Field name</span>
-            </label>
-            <label className="floating-label">
-              <select className="select w-fit min-w-40">
-                <option disabled selected>
-                  Placeholder
-                </option>
-                <option>Option</option>
-              </select>
-              <span>Operation</span>
-            </label>
-            <label className="floating-label">
-              <select className="select w-fit min-w-40">
-                <option disabled selected>
-                  Placeholder
-                </option>
-                <option>Option</option>
-              </select>
-              <span>Value</span>
-            </label>
-            <button className="btn btn-error">
-              <Trash size={16} />
-            </button>
-          </div>
+          <RuleOptions rule={rule} onChange={setRule} onRemove={() => {}} />
         </div>
       </div>
     </div>
