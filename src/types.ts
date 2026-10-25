@@ -20,7 +20,7 @@ export type TransactionState =
 	| "CANCELLED"
 	| "FAILED"
 	| "ABORTED";
-export type Value = string | number | Money | TransactionState; // TODO: Check a better way to conditionally check the value depending on FieldName
+export type Value = string | number | Money | TransactionState; // TODO: Check a better way to conditionally check the value depending on FieldName, issue #5
 
 export interface Rule {
 	fieldName: FieldName;
