@@ -54,7 +54,7 @@ function App() {
       <h1 className="text-2xl font-bold">Query Builder</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <QueryDispatchContext value={dispatch}>
-          <ConditionGroup group={query} isRoot />
+          <ConditionGroup group={query} />
         </QueryDispatchContext>
         <button
           type="submit"

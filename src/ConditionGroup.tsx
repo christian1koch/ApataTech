@@ -6,23 +6,28 @@ import type { Combinator } from "./types";
 
 interface ConditionGroupProps {
   group: GroupNode;
-  isRoot?: boolean;
+  depth?: number;
   canRemove?: boolean;
 }
 
 export default function ConditionGroup({
   group,
-  isRoot = false,
+  depth = 0,
   canRemove = false,
 }: ConditionGroupProps) {
   const dispatch = useQueryDispatch();
+  const isRoot = depth === 0;
   // A group can't be emptied, so its only child can't be removed
   const canRemoveChild = group.children.length > 1;
   // Rules are numbered within their own group, skipping nested groups
   let ruleCount = 0;
 
   return (
-    <fieldset className="fieldset rounded-box border-base-300 border p-4">
+    <fieldset
+      className={`fieldset rounded-box border-base-300 border p-3 sm:p-4 ${
+        depth % 2 === 1 ? "bg-base-200" : "bg-base-100"
+      }`}
+    >
       <legend className="fieldset-legend">{isRoot ? "Query" : "Group"}</legend>
       <div className="flex items-center gap-2">
         <select
@@ -43,24 +48,24 @@ export default function ConditionGroup({
         <div className="ml-auto flex gap-2">
           <button
             type="button"
-            className="btn"
+            className="btn max-sm:btn-square"
             onClick={() => dispatch({ type: "addRule", groupId: group.id })}
           >
             <ListChecks size={16} />
-            Add Rule
+            <span className="max-sm:sr-only">Add Rule</span>
           </button>
           <button
             type="button"
-            className="btn"
+            className="btn max-sm:btn-square"
             onClick={() => dispatch({ type: "addGroup", groupId: group.id })}
           >
             <Group size={16} />
-            Add Group
+            <span className="max-sm:sr-only">Add Group</span>
           </button>
           {!isRoot && (
             <button
               type="button"
-              className="btn btn-error"
+              className="btn btn-ghost btn-square enabled:text-error"
               aria-label="Remove group"
               disabled={!canRemove}
               onClick={() => dispatch({ type: "remove", id: group.id })}
@@ -70,11 +75,14 @@ export default function ConditionGroup({
           )}
         </div>
       </div>
-      {/* role="list" because Safari drops list semantics once list-style
-          is removed, which Tailwind's preflight does */}
-      <ul role="list" className="mt-4 flex flex-col gap-4">
+      <ul role="list" className="mt-3 flex flex-col gap-2">
         {group.children.map((child) => (
-          <li key={child.id}>
+          // Rules get their bottom spacing from the reserved hint line (h-4);
+          // groups have none, so they get the same as a margin
+          <li
+            key={child.id}
+            className={child.kind === "group" ? "mb-4" : undefined}
+          >
             {child.kind === "rule" ? (
               <RuleOptions
                 label={`Rule ${++ruleCount}`}
@@ -86,7 +94,11 @@ export default function ConditionGroup({
                 onRemove={() => dispatch({ type: "remove", id: child.id })}
               />
             ) : (
-              <ConditionGroup group={child} canRemove={canRemoveChild} />
+              <ConditionGroup
+                group={child}
+                depth={depth + 1}
+                canRemove={canRemoveChild}
+              />
             )}
           </li>
         ))}

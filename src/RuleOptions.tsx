@@ -29,11 +29,11 @@ export default function RuleOptions<K extends FieldName>({
   const operations = getOperations(rule.fieldName);
 
   return (
-    <fieldset className="flex items-start gap-2">
+    <fieldset className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-start gap-2 sm:grid-cols-[10rem_10rem_minmax(0,1fr)_auto]">
       <legend className="sr-only">{label}</legend>
       <label className="floating-label">
         <select
-          className="select w-fit min-w-40"
+          className="select w-full"
           value={rule.fieldName}
           onChange={(e) =>
             onChange(createRule(e.target.value as FieldName, rule.operation))
@@ -49,7 +49,7 @@ export default function RuleOptions<K extends FieldName>({
       </label>
       <label className="floating-label">
         <select
-          className="select w-fit min-w-40"
+          className="select w-full"
           value={rule.operation}
           onChange={(e) =>
             onChange(
@@ -66,7 +66,7 @@ export default function RuleOptions<K extends FieldName>({
         </select>
         <span>Operation</span>
       </label>
-      <div className="w-60">
+      <div className="col-span-2 row-start-2 sm:col-span-1 sm:col-start-3 sm:row-start-1">
         <Widget
           value={rule.value}
           onChange={(value) => onChange(toRule({ ...rule, value }))}
@@ -74,7 +74,7 @@ export default function RuleOptions<K extends FieldName>({
       </div>
       <button
         type="button"
-        className="btn btn-error"
+        className="btn btn-ghost btn-square enabled:text-error"
         aria-label="Remove rule"
         disabled={!canRemove}
         onClick={onRemove}
