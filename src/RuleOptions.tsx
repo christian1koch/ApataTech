@@ -1,12 +1,11 @@
 import { Trash } from "lucide-react";
-import {
-  createRule,
-  FIELD_NAMES,
-  FIELDS,
-  getOperations,
-  toRule,
-} from "./fields";
+import { createRule, FIELD_NAMES, FIELDS, getOperations } from "./fields";
 import type { FieldName, OperationsFor, Rule, RuleFor } from "./types";
+
+// Private on purpose: only safe here, where the new operation/value come from
+// FIELDS[K] and so always match the rule's field. TS can't prove a generic
+// RuleFor<K> is a member of the Rule union, hence the cast.
+const toRule = <K extends FieldName>(rule: RuleFor<K>): Rule => rule as Rule;
 
 interface RuleOptionsProps<K extends FieldName> {
   rule: RuleFor<K>;
@@ -20,7 +19,7 @@ export default function RuleOptions<K extends FieldName>({
   onRemove,
 }: RuleOptionsProps<K>) {
   // FIELDS[rule.fieldName] is a FieldConfig<K>, so Widget accepts rule.value
-  const { Widget, options } = FIELDS[rule.fieldName];
+  const { Widget } = FIELDS[rule.fieldName];
   const operations = getOperations(rule.fieldName);
 
   return (
@@ -30,9 +29,7 @@ export default function RuleOptions<K extends FieldName>({
           className="select w-fit min-w-40"
           value={rule.fieldName}
           onChange={(e) =>
-            onChange(
-              toRule(createRule(e.target.value as FieldName, rule.operation))
-            )
+            onChange(createRule(e.target.value as FieldName, rule.operation))
           }
         >
           {FIELD_NAMES.map((fieldName) => (
@@ -64,7 +61,6 @@ export default function RuleOptions<K extends FieldName>({
       </label>
       <Widget
         value={rule.value}
-        options={options}
         onChange={(value) => onChange(toRule({ ...rule, value }))}
       />
       <button

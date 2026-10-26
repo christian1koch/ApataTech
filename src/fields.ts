@@ -10,7 +10,7 @@ import type {
 } from "./types";
 import IntegerWidget from "./widgets/IntegerWidget";
 import MoneyWidget from "./widgets/MoneyWidget";
-import SelectWidget from "./widgets/SelectWidget";
+import { createSelectWidget } from "./widgets/SelectWidget";
 import TextWidget from "./widgets/TextWidget";
 import type { WidgetProps } from "./widgets/types";
 
@@ -18,7 +18,6 @@ export interface FieldConfig<K extends FieldName> {
   label: string;
   defaultValue: FieldValueMap[K];
   Widget: ComponentType<WidgetProps<FieldValueMap[K]>>;
-  options?: readonly FieldValueMap[K][];
 }
 
 // Mapped over FieldName so TS knows FIELDS[k] is a FieldConfig<k>, which ties
@@ -34,8 +33,7 @@ export const FIELDS: { [K in FieldName]: FieldConfig<K> } = {
   transaction_state: {
     label: "Transaction state",
     defaultValue: "SUCCEEDED",
-    Widget: SelectWidget,
-    options: TRANSACTION_STATES,
+    Widget: createSelectWidget(TRANSACTION_STATES),
   },
   device_ip: { label: "Device IP", defaultValue: "", Widget: TextWidget },
   installments: {
@@ -51,9 +49,7 @@ export const getOperations = <K extends FieldName>(
   fieldName: K
 ): readonly OperationsFor<K>[] => OPERATIONS[FIELD_TYPES[fieldName]];
 
-// Builds a valid rule for `fieldName`, keeping `operation` if the field
-// supports it
-export function createRule<K extends FieldName>(
+function buildRule<K extends FieldName>(
   fieldName: K,
   operation?: Operation
 ): RuleFor<K> {
@@ -65,7 +61,8 @@ export function createRule<K extends FieldName>(
   };
 }
 
-// TS can't prove that a generic RuleFor<K> is a member of the Rule union
-// (it can for every concrete K), so this is the one contained cast.
-export const toRule = <K extends FieldName>(rule: RuleFor<K>): Rule =>
-  rule as Rule;
+// Builds a valid rule for `fieldName`, keeping `operation` if the field
+// supports it. buildRule is type-checked per field; the cast is only needed
+// because TS can't prove a generic RuleFor<K> is a member of the Rule union.
+export const createRule = (fieldName: FieldName, operation?: Operation) =>
+  buildRule(fieldName, operation) as Rule;

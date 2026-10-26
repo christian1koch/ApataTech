@@ -1,7 +1,13 @@
 import { createRule } from "./fields";
 import type { Combinator, Rule } from "./types";
 
-export type RuleNode = Rule & { id: string; kind: "rule" };
+// The rule is nested rather than spread so UI-only state added to the node
+// later can never leak into the payload
+export interface RuleNode {
+  id: string;
+  kind: "rule";
+  rule: Rule;
+}
 
 export interface GroupNode {
   id: string;
@@ -22,7 +28,7 @@ export type QueryAction =
 export const createRuleNode = (): RuleNode => ({
   id: crypto.randomUUID(),
   kind: "rule",
-  ...createRule("name"),
+  rule: createRule("name"),
 });
 
 export const createGroup = (): GroupNode => ({
@@ -101,9 +107,7 @@ export function queryReducer(state: GroupNode, action: QueryAction): GroupNode {
       }));
     case "updateRule": {
       const result = updateNode(state, action.id, (node) =>
-        node.kind === "rule"
-          ? { ...action.rule, id: node.id, kind: "rule" }
-          : node
+        node.kind === "rule" ? { ...node, rule: action.rule } : node
       );
       return result.kind === "group" ? result : state;
     }

@@ -10,9 +10,7 @@ const toCondition = (node: QueryNode): Condition => {
       subConditions: node.children.map(toCondition),
     };
   }
-  // Rest keeps the fieldName/operation/value combination intact
-  const { id, kind, ...rule } = node;
-  return rule;
+  return node.rule;
 };
 
 export const toPayload = (root: GroupNode): Query => ({
@@ -30,7 +28,7 @@ const fromCondition = (condition: Condition): QueryNode =>
         combinator: condition.combinator,
         children: condition.subConditions.map(fromCondition),
       }
-    : { ...condition, id: crypto.randomUUID(), kind: "rule" };
+    : { id: crypto.randomUUID(), kind: "rule", rule: condition };
 
 export const fromPayload = (query: Query): GroupNode => ({
   id: crypto.randomUUID(),

@@ -15,7 +15,8 @@ export interface Money {
   currency: Currency;
 }
 
-// Single source of truth: every field and the value type it holds
+// Every field and the value type it holds. FIELD_TYPES and FIELDS must cover
+// the same keys, which the compiler enforces.
 export interface FieldValueMap {
   amount: Money;
   name: string;
