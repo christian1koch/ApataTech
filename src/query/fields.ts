@@ -57,14 +57,14 @@ export const FIELDS: { [K in FieldName]: FieldConfig<K> } = {
 export const FIELD_NAMES = Object.keys(FIELDS) as FieldName[];
 
 export function getOperations<K extends FieldName>(
-  fieldName: K,
+  fieldName: K
 ): readonly OperationsFor<K>[] {
   return OPERATIONS[FIELD_TYPES[fieldName]];
 }
 
 function buildRule<K extends FieldName>(
   fieldName: K,
-  operation?: Operation,
+  operation?: Operation
 ): RuleFor<K> {
   const allowed = getOperations(fieldName);
   return {

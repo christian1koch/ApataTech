@@ -167,6 +167,25 @@ describe("rule fields", () => {
     expect(screen.getByRole("textbox", { name: "Value" })).toHaveValue("john");
   });
 
+  test("shows right away when a carried-over value is invalid for the new field", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const field = screen.getByRole("combobox", { name: "Field name" });
+
+    expect(screen.getByRole("textbox", { name: "Value" })).not.toHaveAttribute(
+      "aria-invalid"
+    );
+
+    await fillName(user);
+    await user.selectOptions(field, "device_ip");
+    const ip = screen.getByRole("textbox", { name: "Value" });
+    expect(ip).toHaveAttribute("aria-invalid", "true");
+
+    await user.clear(ip);
+    await user.type(ip, "192.168.1.1");
+    expect(ip).not.toHaveAttribute("aria-invalid");
+  });
+
   test.each([
     ["name", () => screen.getByRole("textbox", { name: "Value" })],
     ["id", () => screen.getByRole("textbox", { name: "Value" })],
