@@ -14,7 +14,7 @@ export function createIntegerWidget({ min }: { min: number }) {
             type="number"
             min={min}
             step={1}
-            className="input validator"
+            className="input validator w-full"
             placeholder="Value"
             required
             aria-describedby={hintId}

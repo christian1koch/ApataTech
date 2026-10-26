@@ -66,10 +66,12 @@ export default function RuleOptions<K extends FieldName>({
         </select>
         <span>Operation</span>
       </label>
-      <Widget
-        value={rule.value}
-        onChange={(value) => onChange(toRule({ ...rule, value }))}
-      />
+      <div className="w-60">
+        <Widget
+          value={rule.value}
+          onChange={(value) => onChange(toRule({ ...rule, value }))}
+        />
+      </div>
       <button
         type="button"
         className="btn btn-error"

@@ -9,7 +9,7 @@ export function createSelectWidget<T extends string>(options: readonly T[]) {
       <div>
         <label className="floating-label">
           <select
-            className="select w-fit min-w-40"
+            className="select w-full"
             value={value}
             onChange={(e) => onChange(e.target.value as T)}
           >

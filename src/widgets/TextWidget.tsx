@@ -21,7 +21,7 @@ export function createTextWidget({
         <label className="floating-label validator">
           <input
             type="text"
-            className="input validator"
+            className="input validator w-full"
             placeholder="Value"
             required
             pattern={pattern}

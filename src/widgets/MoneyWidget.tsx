@@ -10,12 +10,13 @@ export default function MoneyWidget({ value, onChange }: WidgetProps<Money>) {
     <div>
       {/* `validator` on the row, so the hint can span both inputs */}
       <div className="validator flex items-start gap-2">
-        <label className="floating-label">
+        {/* The amount takes whatever width the currency leaves */}
+        <label className="floating-label min-w-0 flex-1">
           <input
             type="number"
             min={0}
             step={0.01}
-            className="input validator w-32"
+            className="input validator w-full"
             placeholder="Amount"
             required
             aria-describedby={hintId}
