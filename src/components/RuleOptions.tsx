@@ -1,4 +1,3 @@
-import { Trash } from "lucide-react";
 import { OPERATION_LABELS } from "../query/constants";
 import {
   createRule,
@@ -6,7 +5,8 @@ import {
   FIELDS,
   getOperations,
 } from "../query/fields";
-import type { FieldName, OperationsFor, Rule, RuleFor } from "../query/types";
+import type { FieldName, Operation, Rule, RuleFor } from "../query/types";
+import RemoveButton from "./RemoveButton";
 
 // Private on purpose: only safe here, where the new operation/value come from
 // FIELDS[K] and so always match the rule's field. TS can't prove a generic
@@ -37,58 +37,82 @@ export default function RuleOptions<K extends FieldName>({
   return (
     <fieldset className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-start gap-2 sm:grid-cols-[10rem_10rem_minmax(0,1fr)_auto]">
       <legend className="sr-only">{label}</legend>
-      <label className="floating-label">
-        <select
-          className="select w-full"
-          value={rule.fieldName}
-          onChange={(e) =>
-            onChange(createRule(e.target.value as FieldName, rule.operation))
-          }
-        >
-          {FIELD_NAMES.map((fieldName) => (
-            <option key={fieldName} value={fieldName}>
-              {FIELDS[fieldName].label}
-            </option>
-          ))}
-        </select>
-        <span>Field name</span>
-      </label>
-      <label className="floating-label">
-        <select
-          className="select w-full"
-          value={rule.operation}
-          onChange={(e) =>
-            onChange(
-              toRule({
-                ...rule,
-                operation: e.target.value as OperationsFor<K>,
-              })
-            )
-          }
-        >
-          {operations.map((operation) => (
-            <option key={operation} value={operation}>
-              {OPERATION_LABELS[operation]}
-            </option>
-          ))}
-        </select>
-        <span>Operation</span>
-      </label>
+      <FieldSelect
+        value={rule.fieldName}
+        onChange={(fieldName) =>
+          onChange(createRule(fieldName, rule.operation))
+        }
+      />
+      <OperationSelect
+        operations={operations}
+        value={rule.operation}
+        onChange={(operation) => onChange(toRule({ ...rule, operation }))}
+      />
       <div className="col-span-2 row-start-2 sm:col-span-1 sm:col-start-3 sm:row-start-1">
         <Widget
           value={rule.value}
           onChange={(value) => onChange(toRule({ ...rule, value }))}
         />
       </div>
-      <button
-        type="button"
-        className="btn btn-ghost btn-square enabled:text-error"
-        aria-label={`Remove ${label.toLowerCase()}`}
+      <RemoveButton
+        label={`Remove ${label.toLowerCase()}`}
         disabled={!canRemove}
         onClick={onRemove}
-      >
-        <Trash size={16} />
-      </button>
+      />
     </fieldset>
+  );
+}
+
+interface FieldSelectProps {
+  value: FieldName;
+  onChange: (fieldName: FieldName) => void;
+}
+
+function FieldSelect({ value, onChange }: FieldSelectProps) {
+  return (
+    <label className="floating-label">
+      <select
+        className="select w-full"
+        value={value}
+        onChange={(e) => onChange(e.target.value as FieldName)}
+      >
+        {FIELD_NAMES.map((fieldName) => (
+          <option key={fieldName} value={fieldName}>
+            {FIELDS[fieldName].label}
+          </option>
+        ))}
+      </select>
+      <span>Field name</span>
+    </label>
+  );
+}
+
+// Generic so the selected operation keeps the field's narrower operation type
+interface OperationSelectProps<O extends Operation> {
+  operations: readonly O[];
+  value: O;
+  onChange: (operation: O) => void;
+}
+
+function OperationSelect<O extends Operation>({
+  operations,
+  value,
+  onChange,
+}: OperationSelectProps<O>) {
+  return (
+    <label className="floating-label">
+      <select
+        className="select w-full"
+        value={value}
+        onChange={(e) => onChange(e.target.value as O)}
+      >
+        {operations.map((operation) => (
+          <option key={operation} value={operation}>
+            {OPERATION_LABELS[operation]}
+          </option>
+        ))}
+      </select>
+      <span>Operation</span>
+    </label>
   );
 }

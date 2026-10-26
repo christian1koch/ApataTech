@@ -1,16 +1,12 @@
-import { useEffect, useReducer, useState, type FormEvent } from "react";
+import { useEffect, useReducer, useState, type SubmitEvent } from "react";
 import { saveRules } from "./api";
 import ConditionGroup from "./components/ConditionGroup";
+import PayloadPreview from "./components/PayloadPreview";
+import SaveStatus, { type SaveState } from "./components/SaveStatus";
 import { toPayload } from "./query/payload";
 import { QueryDispatchContext } from "./query/QueryContext";
 import { createInitialQuery, queryReducer } from "./query/queryReducer";
 import type { Query } from "./query/types";
-
-type SaveStatus =
-  | { state: "idle" }
-  | { state: "saving" }
-  | { state: "saved" }
-  | { state: "error"; message: string };
 
 export const SAVED_MESSAGE_MS = 3000;
 
@@ -21,7 +17,7 @@ function App() {
     createInitialQuery
   );
   const [submitted, setSubmitted] = useState<Query | null>(null);
-  const [status, setStatus] = useState<SaveStatus>({ state: "idle" });
+  const [status, setStatus] = useState<SaveState>({ state: "idle" });
 
   // The success message hides itself; an error stays until the next submit
   useEffect(() => {
@@ -33,7 +29,7 @@ function App() {
     return () => clearTimeout(timeout);
   }, [status]);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const payload = toPayload(query);
     setSubmitted(payload);
@@ -65,27 +61,8 @@ function App() {
         </button>
       </form>
 
-      <div role="status">
-        {status.state === "saved" && (
-          <p className="alert alert-success">Rules saved.</p>
-        )}
-      </div>
-      <div role="alert">
-        {status.state === "error" && (
-          <p className="alert alert-error">{status.message}</p>
-        )}
-      </div>
-
-      {submitted && (
-        <section aria-labelledby="payload-heading">
-          <h2 id="payload-heading" className="text-lg font-semibold">
-            Payload
-          </h2>
-          <pre className="bg-base-200 rounded-box overflow-x-auto p-4">
-            <code>{JSON.stringify(submitted, null, 2)}</code>
-          </pre>
-        </section>
-      )}
+      <SaveStatus status={status} />
+      {submitted && <PayloadPreview payload={submitted} />}
     </main>
   );
 }

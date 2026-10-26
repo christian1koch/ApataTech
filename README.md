@@ -33,8 +33,11 @@ The query is held as a tree in a reducer and converted to the backend schema on 
 | `src/query/payload.ts`              | Converts the tree to the backend schema       |
 | `src/components/ConditionGroup.tsx` | Renders a group and its children, recursively |
 | `src/components/RuleOptions.tsx`    | Renders one rule: field, operation, value     |
+| `src/components/RemoveButton.tsx`   | Remove button shared by rules and groups      |
 | `src/components/widgets/`           | Value inputs: text, integer, money, select    |
+| `src/components/SaveStatus.tsx`     | Success and error messages after submitting   |
+| `src/components/PayloadPreview.tsx` | Shows the submitted JSON                      |
 | `src/api.ts`                        | Sends the query to the backend                |
-| `src/App.tsx`                       | The form, save status and JSON output         |
+| `src/App.tsx`                       | The form: query state and submit              |
 
 To add a field, add its value type to `FieldValueMap` (`types.ts`), its type to `FIELD_TYPES` (`constants.ts`) and its config to `FIELDS` (`fields.ts`). TypeScript flags any missing step.
