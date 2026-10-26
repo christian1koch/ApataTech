@@ -1,75 +1,38 @@
-# React + TypeScript + Vite
+# Query Builder
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React + TypeScript query builder. Users build nested AND/OR rule groups; on submit the query is shown as JSON and sent to `/api/save-rules`.
 
-Currently, two official plugins are available:
+## Running the project
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Requires Node 22+.
 
-## React Compiler
+```sh
+npm install
+npm run dev              # http://localhost:5173
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+npm test                 # unit and component tests
+npm run test:coverage    # tests with coverage report
+npx playwright install chromium   # once, before the e2e tests
+npm run test:e2e         # end-to-end tests
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+No backend came with the exercise, so `mock-server/saveRules.ts` mocks `POST /api/save-rules` in the dev server.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## How it's built
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+The query is held as a tree in a reducer and converted to the backend schema on submit.
 
-```
+| Module                   | Responsibility                                |
+| ------------------------ | --------------------------------------------- |
+| `src/types.ts`           | Backend schema types                          |
+| `src/constants.ts`       | Operations per field type, currencies, states |
+| `src/fields.ts`          | Field registry: label, default value, widget  |
+| `src/widgets/`           | Value inputs: text, integer, money, select    |
+| `src/queryReducer.ts`    | Query tree state and actions                  |
+| `src/payload.ts`         | Converts the tree to the backend schema       |
+| `src/ConditionGroup.tsx` | Renders a group and its children, recursively |
+| `src/RuleOptions.tsx`    | Renders one rule: field, operation, value     |
+| `src/api.ts`             | Sends the query to the backend                |
+| `src/App.tsx`            | The form, save status and JSON output         |
+
+To add a field, add its value type to `FieldValueMap` (`types.ts`), its type to `FIELD_TYPES` (`constants.ts`) and its config to `FIELDS` (`fields.ts`). TypeScript flags any missing step.
