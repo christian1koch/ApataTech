@@ -45,7 +45,7 @@ export const FIELDS: { [K in FieldName]: FieldConfig<K> } = {
     defaultValue: "",
     Widget: createTextWidget({
       pattern: IPV4_PATTERN,
-      hint: "Enter an IPv4 address, e.g. 192.168.1.1",
+      hint: "IPv4, e.g. 192.168.1.1",
     }),
   },
   installments: {

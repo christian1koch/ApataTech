@@ -86,7 +86,7 @@ test("blocks submit and shows hints until the values are valid", async ({
   const name = nameRule.getByRole("textbox", { name: "Value" });
   const ip = ipRule.getByRole("textbox", { name: "Value" });
   const nameHint = nameRule.getByText("Required");
-  const ipHint = ipRule.getByText("Enter an IPv4 address");
+  const ipHint = ipRule.getByText("IPv4, e.g. 192.168.1.1");
 
   await ip.fill("256.1.1.1");
   await page.getByRole("button", { name: "Submit" }).click();

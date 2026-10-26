@@ -1,8 +1,9 @@
 import { useId } from "react";
 import type { WidgetProps } from "./types";
+import ValidatorHint from "./ValidatorHint";
 
 export function createIntegerWidget({ min }: { min: number }) {
-  const hint = `Enter a whole number of ${min} or more`;
+  const hint = `Whole number, ${min} or more`;
 
   return function IntegerWidget({ value, onChange }: WidgetProps<number>) {
     const hintId = useId();
@@ -22,9 +23,7 @@ export function createIntegerWidget({ min }: { min: number }) {
           />
           <span>Value</span>
         </label>
-        <p id={hintId} className="validator-hint hidden">
-          {hint}
-        </p>
+        <ValidatorHint id={hintId}>{hint}</ValidatorHint>
       </div>
     );
   };

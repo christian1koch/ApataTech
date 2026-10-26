@@ -1,6 +1,7 @@
 import { useId } from "react";
 import { NON_BLANK_PATTERN } from "../constants";
 import type { WidgetProps } from "./types";
+import ValidatorHint from "./ValidatorHint";
 
 interface TextWidgetOptions {
   pattern?: string;
@@ -31,9 +32,7 @@ export function createTextWidget({
           />
           <span>Value</span>
         </label>
-        <p id={hintId} className="validator-hint hidden">
-          {hint}
-        </p>
+        <ValidatorHint id={hintId}>{hint}</ValidatorHint>
       </div>
     );
   };

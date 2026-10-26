@@ -2,13 +2,15 @@ import { useId } from "react";
 import { CURRENCIES } from "../constants";
 import type { Currency, Money } from "../types";
 import type { WidgetProps } from "./types";
+import ValidatorHint from "./ValidatorHint";
 
 export default function MoneyWidget({ value, onChange }: WidgetProps<Money>) {
   const hintId = useId();
   return (
-    <div className="flex items-start gap-2">
-      <div>
-        <label className="floating-label validator">
+    <div>
+      {/* `validator` on the row, so the hint can span both inputs */}
+      <div className="validator flex items-start gap-2">
+        <label className="floating-label">
           <input
             type="number"
             min={0}
@@ -24,24 +26,22 @@ export default function MoneyWidget({ value, onChange }: WidgetProps<Money>) {
           />
           <span>Amount</span>
         </label>
-        <p id={hintId} className="validator-hint hidden w-32">
-          Enter 0 or more, with up to 2 decimals
-        </p>
+        <label className="floating-label">
+          <select
+            className="select w-24"
+            value={value.currency}
+            onChange={(e) =>
+              onChange({ ...value, currency: e.target.value as Currency })
+            }
+          >
+            {CURRENCIES.map((currency) => (
+              <option key={currency}>{currency}</option>
+            ))}
+          </select>
+          <span>Currency</span>
+        </label>
       </div>
-      <label className="floating-label">
-        <select
-          className="select w-24"
-          value={value.currency}
-          onChange={(e) =>
-            onChange({ ...value, currency: e.target.value as Currency })
-          }
-        >
-          {CURRENCIES.map((currency) => (
-            <option key={currency}>{currency}</option>
-          ))}
-        </select>
-        <span>Currency</span>
-      </label>
+      <ValidatorHint id={hintId}>0 or more, up to 2 decimals</ValidatorHint>
     </div>
   );
 }
