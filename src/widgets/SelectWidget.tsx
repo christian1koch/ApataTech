@@ -1,14 +1,18 @@
 import type { WidgetProps } from "./types";
 
-export default function SelectWidget({ value, onChange, config }: WidgetProps) {
+export default function SelectWidget<T extends string>({
+  value,
+  onChange,
+  options = [],
+}: WidgetProps<T>) {
   return (
     <label className="floating-label">
       <select
         className="select w-fit min-w-40"
-        value={value as string}
-        onChange={(e) => onChange(e.target.value)}
+        value={value}
+        onChange={(e) => onChange(e.target.value as T)}
       >
-        {config.options?.map((option) => (
+        {options.map((option) => (
           <option key={option}>{option}</option>
         ))}
       </select>

@@ -1,4 +1,4 @@
-import { FIELDS } from "./fields";
+import { createRule } from "./fields";
 import type { Combinator, Rule } from "./types";
 
 export type RuleNode = Rule & { id: string; kind: "rule" };
@@ -19,12 +19,10 @@ export type QueryAction =
   | { type: "setCombinator"; groupId: string; combinator: Combinator }
   | { type: "remove"; id: string };
 
-export const createRule = (): RuleNode => ({
+export const createRuleNode = (): RuleNode => ({
   id: crypto.randomUUID(),
   kind: "rule",
-  fieldName: "name",
-  operation: "EQUAL",
-  value: FIELDS.name.defaultValue,
+  ...createRule("name"),
 });
 
 export const createGroup = (): GroupNode => ({
@@ -36,7 +34,7 @@ export const createGroup = (): GroupNode => ({
 
 export const createInitialQuery = (): GroupNode => ({
   ...createGroup(),
-  children: [createRule()],
+  children: [createRuleNode()],
 });
 
 // Returns a copy of the tree with the node matching `id` replaced by the
@@ -88,7 +86,7 @@ export function queryReducer(state: GroupNode, action: QueryAction): GroupNode {
           firstGroupIndex === -1 ? group.children.length : firstGroupIndex;
         return {
           ...group,
-          children: group.children.toSpliced(insertAt, 0, createRule()),
+          children: group.children.toSpliced(insertAt, 0, createRuleNode()),
         };
       });
     case "addGroup":

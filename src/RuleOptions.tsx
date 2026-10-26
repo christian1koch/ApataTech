@@ -1,31 +1,27 @@
 import { Trash } from "lucide-react";
-import { FIELDS, getOperations } from "./fields";
-import type { FieldName, Operation, Rule } from "./types";
-import { WIDGETS } from "./widgets";
+import {
+  createRule,
+  FIELD_NAMES,
+  FIELDS,
+  getOperations,
+  toRule,
+} from "./fields";
+import type { FieldName, OperationsFor, Rule, RuleFor } from "./types";
 
-interface RuleOptionsProps {
-  rule: Rule;
+interface RuleOptionsProps<K extends FieldName> {
+  rule: RuleFor<K>;
   onChange: (rule: Rule) => void;
   onRemove: () => void;
 }
 
-export default function RuleOptions({
+export default function RuleOptions<K extends FieldName>({
   rule,
   onChange,
   onRemove,
-}: RuleOptionsProps) {
-  const config = FIELDS[rule.fieldName];
+}: RuleOptionsProps<K>) {
+  // FIELDS[rule.fieldName] is a FieldConfig<K>, so Widget accepts rule.value
+  const { Widget, options } = FIELDS[rule.fieldName];
   const operations = getOperations(rule.fieldName);
-  const Widget = WIDGETS[config.widget];
-
-  const changeField = (fieldName: FieldName) => {
-    const allowed = getOperations(fieldName);
-    onChange({
-      fieldName,
-      operation: allowed.includes(rule.operation) ? rule.operation : allowed[0],
-      value: FIELDS[fieldName].defaultValue,
-    });
-  };
 
   return (
     <div className="flex gap-2">
@@ -33,11 +29,15 @@ export default function RuleOptions({
         <select
           className="select w-fit min-w-40"
           value={rule.fieldName}
-          onChange={(e) => changeField(e.target.value as FieldName)}
+          onChange={(e) =>
+            onChange(
+              toRule(createRule(e.target.value as FieldName, rule.operation))
+            )
+          }
         >
-          {Object.entries(FIELDS).map(([key, field]) => (
-            <option key={key} value={key}>
-              {field.label}
+          {FIELD_NAMES.map((fieldName) => (
+            <option key={fieldName} value={fieldName}>
+              {FIELDS[fieldName].label}
             </option>
           ))}
         </select>
@@ -48,7 +48,12 @@ export default function RuleOptions({
           className="select w-fit min-w-40"
           value={rule.operation}
           onChange={(e) =>
-            onChange({ ...rule, operation: e.target.value as Operation })
+            onChange(
+              toRule({
+                ...rule,
+                operation: e.target.value as OperationsFor<K>,
+              })
+            )
           }
         >
           {operations.map((operation) => (
@@ -59,8 +64,8 @@ export default function RuleOptions({
       </label>
       <Widget
         value={rule.value}
-        config={config}
-        onChange={(value) => onChange({ ...rule, value })}
+        options={options}
+        onChange={(value) => onChange(toRule({ ...rule, value }))}
       />
       <button
         type="button"
