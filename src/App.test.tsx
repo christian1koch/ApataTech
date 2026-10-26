@@ -286,6 +286,27 @@ describe("submitting the query", () => {
     expect(JSON.parse(init?.body as string).combinator).toBe("OR");
   });
 
+  test("sends the chosen transaction state", async () => {
+    const fetchSpy = mockFetchOk();
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Field name" }),
+      "transaction_state"
+    );
+    const value = screen.getByRole("combobox", { name: "Value" });
+    await user.selectOptions(value, "REJECTED");
+    expect(value).toHaveValue("REJECTED");
+    await user.click(screen.getByRole("button", { name: "Submit" }));
+
+    await screen.findByRole("status");
+    const [, init] = fetchSpy.mock.calls[0];
+    expect(JSON.parse(init?.body as string).conditions).toEqual([
+      { fieldName: "transaction_state", operation: "EQUAL", value: "REJECTED" },
+    ]);
+  });
+
   test("disables Submit while the request is in flight", async () => {
     vi.spyOn(globalThis, "fetch").mockReturnValue(new Promise(() => {}));
     const user = userEvent.setup();
