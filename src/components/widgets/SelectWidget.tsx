@@ -1,8 +1,6 @@
 import type { WidgetProps } from "./types";
 import ValidatorHint from "./ValidatorHint";
 
-// Binds the options into the widget, so a select field can't be configured
-// without them
 export function createSelectWidget<T extends string>(options: readonly T[]) {
   return function SelectWidget({ value, onChange }: WidgetProps<T>) {
     return (
@@ -19,7 +17,6 @@ export function createSelectWidget<T extends string>(options: readonly T[]) {
           </select>
           <span>Value</span>
         </label>
-        {/* Can't be invalid; only keeps the row the same height as others */}
         <ValidatorHint />
       </div>
     );

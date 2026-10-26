@@ -15,8 +15,6 @@ export interface Money {
   currency: Currency;
 }
 
-// Every field and the value type it holds. FIELD_TYPES and FIELDS must cover
-// the same keys, which the compiler enforces.
 export interface FieldValueMap {
   amount: Money;
   name: string;
@@ -37,7 +35,6 @@ export interface RuleFor<K extends FieldName> {
   value: FieldValueMap[K];
 }
 
-// Union of every valid rule, discriminated by fieldName
 export type Rule = { [K in FieldName]: RuleFor<K> }[FieldName];
 
 export interface Group {

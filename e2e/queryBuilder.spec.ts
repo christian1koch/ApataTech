@@ -91,7 +91,6 @@ test("blocks submit and shows hints until the values are valid", async ({
   await ip.fill("256.1.1.1");
   await page.getByRole("button", { name: "Submit" }).click();
 
-  // The browser focuses the first invalid field, and the hints appear
   await expect(name).toBeFocused();
   await expect(nameHint).toBeVisible();
   await expect(ipHint).toBeVisible();

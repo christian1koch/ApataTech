@@ -8,7 +8,6 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     setupFiles: ["./src/test/setup.ts"],
-    // Playwright runs the specs in e2e/
     include: ["src/**/*.test.{ts,tsx}"],
     coverage: {
       provider: "v8",

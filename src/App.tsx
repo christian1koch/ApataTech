@@ -19,7 +19,6 @@ function App() {
   const [submitted, setSubmitted] = useState<Query | null>(null);
   const [status, setStatus] = useState<SaveState>({ state: "idle" });
 
-  // The success message hides itself; an error stays until the next submit
   useEffect(() => {
     if (status.state !== "saved") return;
     const timeout = setTimeout(

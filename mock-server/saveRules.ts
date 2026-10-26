@@ -1,17 +1,19 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
 
-// Stand-in for the backend, which wasn't provided with the exercise.
-// Echoes the query back, or returns 400 if the body isn't a query.
+// Mock of the backend, which wasn't provided with the exercise
 
 const DELAY_MS = 500;
 
-const isQuery = (body: unknown) =>
-  typeof body === "object" &&
-  body !== null &&
-  "combinator" in body &&
-  "conditions" in body &&
-  Array.isArray(body.conditions);
+function isQuery(body: unknown) {
+  return (
+    typeof body === "object" &&
+    body !== null &&
+    "combinator" in body &&
+    "conditions" in body &&
+    Array.isArray(body.conditions)
+  );
+}
 
 function sendJson(res: ServerResponse, status: number, body: unknown) {
   res.statusCode = status;

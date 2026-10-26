@@ -8,14 +8,12 @@ import {
 import type { FieldName, Operation, Rule, RuleFor } from "../query/types";
 import RemoveButton from "./RemoveButton";
 
-// Private on purpose: only safe here, where the new operation/value come from
-// FIELDS[K] and so always match the rule's field. TS can't prove a generic
-// RuleFor<K> is a member of the Rule union, hence the cast.
-const toRule = <K extends FieldName>(rule: RuleFor<K>): Rule => rule as Rule;
+// TS can't prove a generic RuleFor<K> is a member of the Rule union
+function toRule<K extends FieldName>(rule: RuleFor<K>): Rule {
+  return rule as Rule;
+}
 
 interface RuleOptionsProps<K extends FieldName> {
-  // Names the rule for assistive tech, e.g. "Rule 2", since every rule's
-  // inputs share the same visible labels
   label: string;
   rule: RuleFor<K>;
   canRemove: boolean;
@@ -30,7 +28,6 @@ export default function RuleOptions<K extends FieldName>({
   onChange,
   onRemove,
 }: RuleOptionsProps<K>) {
-  // FIELDS[rule.fieldName] is a FieldConfig<K>, so Widget accepts rule.value
   const { Widget } = FIELDS[rule.fieldName];
   const operations = getOperations(rule.fieldName);
 
@@ -87,7 +84,6 @@ function FieldSelect({ value, onChange }: FieldSelectProps) {
   );
 }
 
-// Generic so the selected operation keeps the field's narrower operation type
 interface OperationSelectProps<O extends Operation> {
   operations: readonly O[];
   value: O;

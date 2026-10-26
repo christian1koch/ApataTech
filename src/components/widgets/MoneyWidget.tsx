@@ -8,9 +8,7 @@ export default function MoneyWidget({ value, onChange }: WidgetProps<Money>) {
   const hintId = useId();
   return (
     <div>
-      {/* `validator` on the row, so the hint can span both inputs */}
       <div className="validator flex items-start gap-2">
-        {/* The amount takes whatever width the currency leaves */}
         <label className="floating-label min-w-0 flex-1">
           <input
             type="number"

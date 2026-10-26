@@ -12,10 +12,7 @@ interface ConditionGroupProps {
   canRemove?: boolean;
 }
 
-// Rules and groups are numbered separately within their parent, e.g. "Rule 2"
-// and "Group 1", so assistive tech can tell siblings apart. The numbers are
-// only in the accessible names: on screen they'd look like they count across
-// the whole query.
+// Numbered names like "Group 1" are only for assistive tech
 function childLabels(children: QueryNode[]) {
   const counts = { rule: 0, group: 0 };
   return children.map((child) =>
@@ -31,7 +28,6 @@ export default function ConditionGroup({
 }: ConditionGroupProps) {
   const dispatch = useQueryDispatch();
   const isRoot = depth === 0;
-  // A group can't be emptied, so its only child can't be removed
   const canRemoveChild = group.children.length > 1;
   const labels = childLabels(group.children);
 
@@ -51,8 +47,7 @@ export default function ConditionGroup({
       />
       <ul role="list" className="mt-3 flex flex-col gap-2">
         {group.children.map((child, i) => (
-          // Rules get their bottom spacing from the reserved hint line (h-4);
-          // groups have none, so they get the same as a margin
+          // Matches the hint line (h-4) that spaces rules
           <li
             key={child.id}
             className={child.kind === "group" ? "mb-4" : undefined}

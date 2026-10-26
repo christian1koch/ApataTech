@@ -1,8 +1,7 @@
 import type { GroupNode, QueryNode } from "./queryReducer";
 import type { Condition, Query, Rule } from "./types";
 
-// UI tree -> backend schema
-const toCondition = (node: QueryNode): Condition => {
+function toCondition(node: QueryNode): Condition {
   if (node.kind === "group") {
     return {
       combinator: node.combinator,
@@ -10,7 +9,7 @@ const toCondition = (node: QueryNode): Condition => {
     };
   }
   return trimValue(node.rule);
-};
+}
 
 function trimValue(rule: Rule): Rule {
   switch (rule.fieldName) {
@@ -23,7 +22,9 @@ function trimValue(rule: Rule): Rule {
   }
 }
 
-export const toPayload = (root: GroupNode): Query => ({
-  combinator: root.combinator,
-  conditions: root.children.map(toCondition),
-});
+export function toPayload(root: GroupNode): Query {
+  return {
+    combinator: root.combinator,
+    conditions: root.children.map(toCondition),
+  };
+}

@@ -9,7 +9,6 @@ export async function saveRules(query: Query): Promise<void> {
       body: JSON.stringify(query),
     });
   } catch {
-    // fetch only rejects when the request never got a response
     throw new Error("Couldn't reach the server, please try again");
   }
   if (!response.ok) {
@@ -21,7 +20,6 @@ export async function saveRules(query: Query): Promise<void> {
   }
 }
 
-// The backend sends { error: string } on failure; any other body is ignored
 async function readErrorMessage(response: Response) {
   const body: unknown = await response.json().catch(() => null);
   return typeof body === "object" &&

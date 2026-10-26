@@ -1,8 +1,6 @@
 import { createRule } from "./fields";
 import type { Combinator, Rule } from "./types";
 
-// The rule is nested rather than spread so UI-only state added to the node
-// later can never leak into the payload
 export interface RuleNode {
   id: string;
   kind: "rule";
@@ -25,25 +23,23 @@ export type QueryAction =
   | { type: "setCombinator"; groupId: string; combinator: Combinator }
   | { type: "remove"; id: string };
 
-export const createRuleNode = (): RuleNode => ({
-  id: crypto.randomUUID(),
-  kind: "rule",
-  rule: createRule("name"),
-});
+export function createRuleNode(): RuleNode {
+  return { id: crypto.randomUUID(), kind: "rule", rule: createRule("name") };
+}
 
 // Groups are never empty: they start with a rule and their last child can't be
-// removed, so every group in the payload has at least one condition
-export const createGroup = (): GroupNode => ({
-  id: crypto.randomUUID(),
-  kind: "group",
-  combinator: "AND",
-  children: [createRuleNode()],
-});
+// removed
+export function createGroup(): GroupNode {
+  return {
+    id: crypto.randomUUID(),
+    kind: "group",
+    combinator: "AND",
+    children: [createRuleNode()],
+  };
+}
 
 export const createInitialQuery = createGroup;
 
-// Returns a copy of the tree with the node matching `id` replaced by the
-// result of `update`.
 function updateNode(
   node: QueryNode,
   id: string,
@@ -57,9 +53,6 @@ function updateNode(
   };
 }
 
-// Returns a copy of the group with the node matching `id` removed at any
-// depth. The group passed in is never removed itself, and neither is a
-// group's last child.
 function removeNode(group: GroupNode, id: string): GroupNode {
   const remaining = group.children.filter((child) => child.id !== id);
   return {

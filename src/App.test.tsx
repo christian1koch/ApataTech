@@ -9,13 +9,11 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-// The initial query is a single empty name rule, which isn't valid yet
 const fillName = (user: UserEvent) =>
   user.type(screen.getByRole("textbox", { name: "Value" }), "john");
 
 const getRoot = () => screen.getByRole("group", { name: "Query" });
 
-// Rules are numbered within their group, so look them up inside one
 const getRule = (group: HTMLElement, n: number) =>
   within(group).getByRole("group", { name: `Rule ${n}` });
 
@@ -115,7 +113,6 @@ describe("building the query", () => {
     });
     expect(removeGroup).toBeEnabled();
 
-    // Remove the root's own rule, leaving the group as its only child
     await user.click(
       within(root).getAllByRole("button", { name: "Remove rule 1" })[0]
     );
@@ -212,13 +209,11 @@ describe("rule fields", () => {
     expect(within(root).getAllByRole("group", { name: "Rule 2" })).toHaveLength(
       1
     );
-    // Root: two rules and the nested group
     expect(within(root).getAllByRole("list")[0].children).toHaveLength(3);
   });
 });
 
 describe("submitting the query", () => {
-  // Screen readers can miss live regions that are added with their text
   test("the status and alert regions are in the page before submitting", () => {
     render(<App />);
 

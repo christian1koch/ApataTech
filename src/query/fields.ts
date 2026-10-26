@@ -25,10 +25,7 @@ export interface FieldConfig<K extends FieldName> {
   Widget: ComponentType<WidgetProps<FieldValueMap[K]>>;
 }
 
-// Number defaults are NaN, which the widgets show as an empty, required input,
-// so the user has to enter a value before submitting.
-// Mapped over FieldName so TS knows FIELDS[k] is a FieldConfig<k>, which ties
-// each field's Widget to its value type
+// NaN number defaults render as empty required inputs
 export const FIELDS: { [K in FieldName]: FieldConfig<K> } = {
   amount: {
     label: "Amount",
@@ -59,9 +56,11 @@ export const FIELDS: { [K in FieldName]: FieldConfig<K> } = {
 
 export const FIELD_NAMES = Object.keys(FIELDS) as FieldName[];
 
-export const getOperations = <K extends FieldName>(
+export function getOperations<K extends FieldName>(
   fieldName: K
-): readonly OperationsFor<K>[] => OPERATIONS[FIELD_TYPES[fieldName]];
+): readonly OperationsFor<K>[] {
+  return OPERATIONS[FIELD_TYPES[fieldName]];
+}
 
 function buildRule<K extends FieldName>(
   fieldName: K,
@@ -75,8 +74,7 @@ function buildRule<K extends FieldName>(
   };
 }
 
-// Builds a valid rule for `fieldName`, keeping `operation` if the field
-// supports it. buildRule is type-checked per field; the cast is only needed
-// because TS can't prove a generic RuleFor<K> is a member of the Rule union.
-export const createRule = (fieldName: FieldName, operation?: Operation) =>
-  buildRule(fieldName, operation) as Rule;
+// TS can't prove a generic RuleFor<K> is a member of the Rule union
+export function createRule(fieldName: FieldName, operation?: Operation) {
+  return buildRule(fieldName, operation) as Rule;
+}

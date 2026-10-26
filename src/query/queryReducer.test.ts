@@ -70,7 +70,6 @@ describe("addGroup", () => {
   });
 
   test("nests to any depth", () => {
-    // Follows the last child down while it's a group
     const deepest = (group: GroupNode): GroupNode => {
       const last = group.children.at(-1);
       return last?.kind === "group" ? deepest(last) : group;
