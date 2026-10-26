@@ -17,7 +17,7 @@ test("builds the brief's nested example and saves it", async ({ page }) => {
     .fill("john");
 
   await root.getByRole("button", { name: "Add Group" }).click();
-  const nested = root.getByRole("group", { name: "Group", exact: true });
+  const nested = root.getByRole("group", { name: "Group 1", exact: true });
 
   const idRule = nested.getByRole("group", { name: "Rule 1" });
   await idRule.getByRole("combobox", { name: "Field name" }).selectOption("id");

@@ -1,4 +1,4 @@
-import { act, render, screen, within } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import App, { SAVED_MESSAGE_MS } from "./App";
@@ -39,16 +39,18 @@ describe("building the query", () => {
     expect(getRule(root, 2)).toBeInTheDocument();
     for (const n of [1, 2]) {
       expect(
-        within(getRule(root, n)).getByRole("button", { name: "Remove rule" })
+        within(getRule(root, n)).getByRole("button", {
+          name: `Remove rule ${n}`,
+        })
       ).toBeEnabled();
     }
 
     await user.click(
-      within(getRule(root, 1)).getByRole("button", { name: "Remove rule" })
+      within(getRule(root, 1)).getByRole("button", { name: "Remove rule 1" })
     );
     expect(within(root).queryByRole("group", { name: "Rule 2" })).toBeNull();
     expect(
-      within(getRule(root, 1)).getByRole("button", { name: "Remove rule" })
+      within(getRule(root, 1)).getByRole("button", { name: "Remove rule 1" })
     ).toBeDisabled();
   });
 
@@ -58,7 +60,7 @@ describe("building the query", () => {
     const root = getRoot();
 
     await user.click(within(root).getByRole("button", { name: "Add Group" }));
-    const nested = within(root).getByRole("group", { name: "Group" });
+    const nested = within(root).getByRole("group", { name: "Group 1" });
 
     expect(
       within(nested).getByRole("combobox", { name: "Combinator" })
@@ -69,9 +71,26 @@ describe("building the query", () => {
     expect(getRule(nested, 2)).toBeInTheDocument();
 
     await user.click(
-      within(nested).getByRole("button", { name: "Remove group" })
+      within(nested).getByRole("button", { name: "Remove group 1" })
     );
-    expect(within(root).queryByRole("group", { name: "Group" })).toBeNull();
+    expect(within(root).queryByRole("group", { name: "Group 1" })).toBeNull();
+  });
+
+  test("sibling groups are numbered, and so are their remove buttons", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const root = getRoot();
+
+    const addGroup = within(root).getByRole("button", { name: "Add Group" });
+    await user.click(addGroup);
+    await user.click(addGroup);
+
+    const second = within(root).getByRole("group", { name: "Group 2" });
+    await user.click(
+      within(second).getByRole("button", { name: "Remove group 2" })
+    );
+    expect(within(root).queryByRole("group", { name: "Group 2" })).toBeNull();
+    expect(within(root).getByRole("group", { name: "Group 1" })).toBeVisible();
   });
 
   test("nests groups inside groups", async () => {
@@ -79,10 +98,10 @@ describe("building the query", () => {
     render(<App />);
 
     await user.click(screen.getByRole("button", { name: "Add Group" }));
-    const nested = screen.getByRole("group", { name: "Group" });
+    const nested = screen.getByRole("group", { name: "Group 1" });
     await user.click(within(nested).getByRole("button", { name: "Add Group" }));
 
-    expect(screen.getAllByRole("group", { name: "Group" })).toHaveLength(2);
+    expect(screen.getAllByRole("group", { name: "Group 1" })).toHaveLength(2);
   });
 
   test("a group that is its parent's only child can't be removed", async () => {
@@ -92,13 +111,13 @@ describe("building the query", () => {
 
     await user.click(within(root).getByRole("button", { name: "Add Group" }));
     const removeGroup = within(root).getByRole("button", {
-      name: "Remove group",
+      name: "Remove group 1",
     });
     expect(removeGroup).toBeEnabled();
 
     // Remove the root's own rule, leaving the group as its only child
     await user.click(
-      within(root).getAllByRole("button", { name: "Remove rule" })[0]
+      within(root).getAllByRole("button", { name: "Remove rule 1" })[0]
     );
     expect(removeGroup).toBeDisabled();
   });
@@ -186,7 +205,7 @@ describe("rule fields", () => {
     await user.click(screen.getByRole("button", { name: "Add Group" }));
 
     const root = getRoot();
-    const nested = within(root).getByRole("group", { name: "Group" });
+    const nested = within(root).getByRole("group", { name: "Group 1" });
 
     expect(getRule(nested, 1)).toBeInTheDocument();
     expect(within(nested).queryByRole("group", { name: "Rule 2" })).toBeNull();
@@ -199,6 +218,14 @@ describe("rule fields", () => {
 });
 
 describe("submitting the query", () => {
+  // Screen readers can miss live regions that are added with their text
+  test("the status and alert regions are in the page before submitting", () => {
+    render(<App />);
+
+    expect(screen.getByRole("status")).toBeEmptyDOMElement();
+    expect(screen.getByRole("alert")).toBeEmptyDOMElement();
+  });
+
   test("builds, shows and sends the brief's nested example", async () => {
     const fetchSpy = mockFetchOk();
     const user = userEvent.setup();
@@ -210,7 +237,7 @@ describe("submitting the query", () => {
       "john"
     );
     await user.click(within(root).getByRole("button", { name: "Add Group" }));
-    const nested = within(root).getByRole("group", { name: "Group" });
+    const nested = within(root).getByRole("group", { name: "Group 1" });
 
     const idRule = getRule(nested, 1);
     await user.selectOptions(
@@ -281,7 +308,7 @@ describe("submitting the query", () => {
     );
     await user.click(screen.getByRole("button", { name: "Submit" }));
 
-    await screen.findByRole("status");
+    await screen.findByText("Rules saved.");
     const [, init] = fetchSpy.mock.calls[0];
     expect(JSON.parse(init?.body as string).combinator).toBe("OR");
   });
@@ -300,7 +327,7 @@ describe("submitting the query", () => {
     expect(value).toHaveValue("REJECTED");
     await user.click(screen.getByRole("button", { name: "Submit" }));
 
-    await screen.findByRole("status");
+    await screen.findByText("Rules saved.");
     const [, init] = fetchSpy.mock.calls[0];
     expect(JSON.parse(init?.body as string).conditions).toEqual([
       { fieldName: "transaction_state", operation: "EQUAL", value: "REJECTED" },
@@ -328,8 +355,10 @@ describe("submitting the query", () => {
     await fillName(user);
     await user.click(screen.getByRole("button", { name: "Submit" }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "Saving rules failed with status 400"
+    await waitFor(() =>
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "Saving rules failed with status 400"
+      )
     );
   });
 
@@ -343,8 +372,10 @@ describe("submitting the query", () => {
     await fillName(user);
     await user.click(screen.getByRole("button", { name: "Submit" }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "Saving rules failed with status 400: Body is not a query"
+    await waitFor(() =>
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "Saving rules failed with status 400: Body is not a query"
+      )
     );
   });
 
@@ -358,8 +389,10 @@ describe("submitting the query", () => {
     await fillName(user);
     await user.click(screen.getByRole("button", { name: "Submit" }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "Couldn't reach the server, please try again"
+    await waitFor(() =>
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "Couldn't reach the server, please try again"
+      )
     );
     expect(screen.getByRole("button", { name: "Submit" })).toBeEnabled();
   });
@@ -372,11 +405,11 @@ describe("submitting the query", () => {
 
     await fillName(user);
     await user.click(screen.getByRole("button", { name: "Submit" }));
-    expect(await screen.findByRole("status")).toHaveTextContent("Rules saved.");
+    await screen.findByText("Rules saved.");
 
     act(() => vi.advanceTimersByTime(SAVED_MESSAGE_MS));
 
-    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    expect(screen.getByRole("status")).toBeEmptyDOMElement();
   });
 });
 
@@ -480,6 +513,8 @@ describe("validation", () => {
   test("the only rule in a group can't be removed", () => {
     render(<App />);
 
-    expect(screen.getByRole("button", { name: "Remove rule" })).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: "Remove rule 1" })
+    ).toBeDisabled();
   });
 });

@@ -18,7 +18,7 @@ function App() {
   const [query, dispatch] = useReducer(
     queryReducer,
     undefined,
-    createInitialQuery
+    createInitialQuery,
   );
   const [submitted, setSubmitted] = useState<Query | null>(null);
   const [status, setStatus] = useState<SaveStatus>({ state: "idle" });
@@ -28,7 +28,7 @@ function App() {
     if (status.state !== "saved") return;
     const timeout = setTimeout(
       () => setStatus({ state: "idle" }),
-      SAVED_MESSAGE_MS
+      SAVED_MESSAGE_MS,
     );
     return () => clearTimeout(timeout);
   }, [status]);
@@ -65,16 +65,16 @@ function App() {
         </button>
       </form>
 
-      {status.state === "saved" && (
-        <p role="status" className="alert alert-success">
-          Rules saved.
-        </p>
-      )}
-      {status.state === "error" && (
-        <p role="alert" className="alert alert-error">
-          {status.message}
-        </p>
-      )}
+      <div role="status">
+        {status.state === "saved" && (
+          <p className="alert alert-success">Rules saved.</p>
+        )}
+      </div>
+      <div role="alert">
+        {status.state === "error" && (
+          <p className="alert alert-error">{status.message}</p>
+        )}
+      </div>
 
       {submitted && (
         <section aria-labelledby="payload-heading">

@@ -78,7 +78,7 @@ export default function RuleOptions<K extends FieldName>({
       <button
         type="button"
         className="btn btn-ghost btn-square enabled:text-error"
-        aria-label="Remove rule"
+        aria-label={`Remove ${label.toLowerCase()}`}
         disabled={!canRemove}
         onClick={onRemove}
       >
