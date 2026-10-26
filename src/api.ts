@@ -13,6 +13,21 @@ export async function saveRules(query: Query): Promise<void> {
     throw new Error("Couldn't reach the server, please try again");
   }
   if (!response.ok) {
-    throw new Error(`Saving rules failed with status ${response.status}`);
+    const detail = await readErrorMessage(response);
+    throw new Error(
+      `Saving rules failed with status ${response.status}` +
+        (detail ? `: ${detail}` : "")
+    );
   }
+}
+
+// The backend sends { error: string } on failure; any other body is ignored
+async function readErrorMessage(response: Response) {
+  const body: unknown = await response.json().catch(() => null);
+  return typeof body === "object" &&
+    body !== null &&
+    "error" in body &&
+    typeof body.error === "string"
+    ? body.error
+    : null;
 }

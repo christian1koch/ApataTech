@@ -333,6 +333,21 @@ describe("submitting the query", () => {
     );
   });
 
+  test("shows the server's error message when it sends one", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      Response.json({ error: "Body is not a query" }, { status: 400 })
+    );
+    const user = userEvent.setup();
+    render(<App />);
+
+    await fillName(user);
+    await user.click(screen.getByRole("button", { name: "Submit" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Saving rules failed with status 400: Body is not a query"
+    );
+  });
+
   test("shows the error message when the request fails", async () => {
     vi.spyOn(globalThis, "fetch").mockRejectedValue(
       new TypeError("Failed to fetch")

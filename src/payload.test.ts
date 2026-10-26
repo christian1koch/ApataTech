@@ -49,6 +49,22 @@ describe("toPayload", () => {
     expect(toPayload(tree)).toStrictEqual(singleRulePayload);
   });
 
+  test("trims whitespace around text values", () => {
+    const tree = group("root", "AND", [
+      rule("r1", { fieldName: "name", operation: "EQUAL", value: "  john  " }),
+      rule("r2", { fieldName: "id", operation: "EQUAL", value: " 123 " }),
+      rule("r3", {
+        fieldName: "device_ip",
+        operation: "EQUAL",
+        value: "1.1.1.1 ",
+      }),
+    ]);
+
+    expect(
+      toPayload(tree).conditions.map((c) => "value" in c && c.value)
+    ).toEqual(["john", "123", "1.1.1.1"]);
+  });
+
   test("converts a nested group into subConditions", () => {
     const tree = group("root", "AND", [
       rule("r1", { fieldName: "name", operation: "EQUAL", value: "john" }),
