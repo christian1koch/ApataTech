@@ -57,14 +57,14 @@ export const FIELDS: { [K in FieldName]: FieldConfig<K> } = {
 export const FIELD_NAMES = Object.keys(FIELDS) as FieldName[];
 
 export function getOperations<K extends FieldName>(
-  fieldName: K
+  fieldName: K,
 ): readonly OperationsFor<K>[] {
   return OPERATIONS[FIELD_TYPES[fieldName]];
 }
 
 function buildRule<K extends FieldName>(
   fieldName: K,
-  operation?: Operation
+  operation?: Operation,
 ): RuleFor<K> {
   const allowed = getOperations(fieldName);
   return {
@@ -77,4 +77,11 @@ function buildRule<K extends FieldName>(
 // TS can't prove a generic RuleFor<K> is a member of the Rule union
 export function createRule(fieldName: FieldName, operation?: Operation) {
   return buildRule(fieldName, operation) as Rule;
+}
+
+export function changeField(rule: Rule, fieldName: FieldName): Rule {
+  const next = createRule(fieldName, rule.operation);
+  const bothText =
+    FIELD_TYPES[rule.fieldName] === "text" && FIELD_TYPES[fieldName] === "text";
+  return bothText ? ({ ...next, value: rule.value } as Rule) : next;
 }

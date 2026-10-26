@@ -1,6 +1,6 @@
 import { OPERATION_LABELS } from "../query/constants";
 import {
-  createRule,
+  changeField,
   FIELD_NAMES,
   FIELDS,
   getOperations,
@@ -36,9 +36,7 @@ export default function RuleOptions<K extends FieldName>({
       <legend className="sr-only">{label}</legend>
       <FieldSelect
         value={rule.fieldName}
-        onChange={(fieldName) =>
-          onChange(createRule(fieldName, rule.operation))
-        }
+        onChange={(fieldName) => onChange(changeField(toRule(rule), fieldName))}
       />
       <OperationSelect
         operations={operations}

@@ -154,6 +154,19 @@ describe("rule fields", () => {
     expect(operation).toHaveValue("EQUAL");
   });
 
+  test("keeps the value when switching between text fields", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await fillName(user);
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Field name" }),
+      "id"
+    );
+
+    expect(screen.getByRole("textbox", { name: "Value" })).toHaveValue("john");
+  });
+
   test.each([
     ["name", () => screen.getByRole("textbox", { name: "Value" })],
     ["id", () => screen.getByRole("textbox", { name: "Value" })],
