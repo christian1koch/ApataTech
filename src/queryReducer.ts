@@ -40,20 +40,28 @@ export const createInitialQuery = (): GroupNode => ({
 });
 
 // Returns a copy of the tree with the node matching `id` replaced by the
-// result of `update`, or removed when `update` returns null.
+// result of `update`.
 function updateNode(
   node: QueryNode,
   id: string,
-  update: (node: QueryNode) => QueryNode | null
-): QueryNode | null {
+  update: (node: QueryNode) => QueryNode
+): QueryNode {
   if (node.id === id) return update(node);
   if (node.kind === "rule") return node;
   return {
     ...node,
-    children: node.children.flatMap((child) => {
-      const updated = updateNode(child, id, update);
-      return updated ? [updated] : [];
-    }),
+    children: node.children.map((child) => updateNode(child, id, update)),
+  };
+}
+
+// Returns a copy of the group with the node matching `id` removed at any
+// depth. The group passed in is never removed itself.
+function removeNode(group: GroupNode, id: string): GroupNode {
+  return {
+    ...group,
+    children: group.children
+      .filter((child) => child.id !== id)
+      .map((child) => (child.kind === "group" ? removeNode(child, id) : child)),
   };
 }
 
@@ -65,7 +73,7 @@ function updateGroup(
   const result = updateNode(root, groupId, (node) =>
     node.kind === "group" ? update(node) : node
   );
-  return result?.kind === "group" ? result : root;
+  return result.kind === "group" ? result : root;
 }
 
 export function queryReducer(state: GroupNode, action: QueryAction): GroupNode {
@@ -99,13 +107,9 @@ export function queryReducer(state: GroupNode, action: QueryAction): GroupNode {
           ? { ...action.rule, id: node.id, kind: "rule" }
           : node
       );
-      return result?.kind === "group" ? result : state;
+      return result.kind === "group" ? result : state;
     }
-    case "remove": {
-      // The root group itself can't be removed
-      if (action.id === state.id) return state;
-      const result = updateNode(state, action.id, () => null);
-      return result?.kind === "group" ? result : state;
-    }
+    case "remove":
+      return removeNode(state, action.id);
   }
 }
