@@ -2,7 +2,7 @@ import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import App, { SAVED_MESSAGE_MS } from "./App";
-import type { Query } from "./types";
+import type { Query } from "./query/types";
 
 afterEach(() => {
   vi.restoreAllMocks();

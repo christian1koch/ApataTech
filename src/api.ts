@@ -1,4 +1,4 @@
-import type { Query } from "./types";
+import type { Query } from "./query/types";
 
 export async function saveRules(query: Query): Promise<void> {
   let response: Response;

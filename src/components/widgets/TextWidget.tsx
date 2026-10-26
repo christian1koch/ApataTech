@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { NON_BLANK_PATTERN } from "../constants";
+import { NON_BLANK_PATTERN } from "../../query/constants";
 import type { WidgetProps } from "./types";
 import ValidatorHint from "./ValidatorHint";
 

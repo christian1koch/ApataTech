@@ -13,11 +13,11 @@ import type {
   Rule,
   RuleFor,
 } from "./types";
-import { createIntegerWidget } from "./widgets/IntegerWidget";
-import MoneyWidget from "./widgets/MoneyWidget";
-import { createSelectWidget } from "./widgets/SelectWidget";
-import { createTextWidget } from "./widgets/TextWidget";
-import type { WidgetProps } from "./widgets/types";
+import { createIntegerWidget } from "../components/widgets/IntegerWidget";
+import MoneyWidget from "../components/widgets/MoneyWidget";
+import { createSelectWidget } from "../components/widgets/SelectWidget";
+import { createTextWidget } from "../components/widgets/TextWidget";
+import type { WidgetProps } from "../components/widgets/types";
 
 export interface FieldConfig<K extends FieldName> {
   label: string;

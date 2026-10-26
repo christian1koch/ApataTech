@@ -1,7 +1,12 @@
 import { Trash } from "lucide-react";
-import { OPERATION_LABELS } from "./constants";
-import { createRule, FIELD_NAMES, FIELDS, getOperations } from "./fields";
-import type { FieldName, OperationsFor, Rule, RuleFor } from "./types";
+import { OPERATION_LABELS } from "../query/constants";
+import {
+  createRule,
+  FIELD_NAMES,
+  FIELDS,
+  getOperations,
+} from "../query/fields";
+import type { FieldName, OperationsFor, Rule, RuleFor } from "../query/types";
 
 // Private on purpose: only safe here, where the new operation/value come from
 // FIELDS[K] and so always match the rule's field. TS can't prove a generic

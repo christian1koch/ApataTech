@@ -1,8 +1,8 @@
 import { Group, ListChecks, Trash } from "lucide-react";
-import { useQueryDispatch } from "./QueryContext";
-import type { GroupNode, QueryNode } from "./queryReducer";
+import { useQueryDispatch } from "../query/QueryContext";
+import type { GroupNode, QueryNode } from "../query/queryReducer";
 import RuleOptions from "./RuleOptions";
-import type { Combinator } from "./types";
+import type { Combinator } from "../query/types";
 
 interface ConditionGroupProps {
   group: GroupNode;

@@ -1,6 +1,6 @@
 import { useId } from "react";
-import { CURRENCIES } from "../constants";
-import type { Currency, Money } from "../types";
+import { CURRENCIES } from "../../query/constants";
+import type { Currency, Money } from "../../query/types";
 import type { WidgetProps } from "./types";
 import ValidatorHint from "./ValidatorHint";
 

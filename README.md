@@ -22,17 +22,19 @@ No backend came with the exercise, so `mock-server/saveRules.ts` mocks `POST /ap
 
 The query is held as a tree in a reducer and converted to the backend schema on submit.
 
-| Module                   | Responsibility                                |
-| ------------------------ | --------------------------------------------- |
-| `src/types.ts`           | Backend schema types                          |
-| `src/constants.ts`       | Operations per field type, currencies, states |
-| `src/fields.ts`          | Field registry: label, default value, widget  |
-| `src/widgets/`           | Value inputs: text, integer, money, select    |
-| `src/queryReducer.ts`    | Query tree state and actions                  |
-| `src/payload.ts`         | Converts the tree to the backend schema       |
-| `src/ConditionGroup.tsx` | Renders a group and its children, recursively |
-| `src/RuleOptions.tsx`    | Renders one rule: field, operation, value     |
-| `src/api.ts`             | Sends the query to the backend                |
-| `src/App.tsx`            | The form, save status and JSON output         |
+`src/query/` holds the query's data and state, `src/components/` the UI.
+
+| Module                              | Responsibility                                |
+| ----------------------------------- | --------------------------------------------- |
+| `src/query/types.ts`                | Backend schema types                          |
+| `src/query/constants.ts`            | Operations per field type, currencies, states |
+| `src/query/fields.ts`               | Field registry: label, default value, widget  |
+| `src/query/queryReducer.ts`         | Query tree state and actions                  |
+| `src/query/payload.ts`              | Converts the tree to the backend schema       |
+| `src/components/ConditionGroup.tsx` | Renders a group and its children, recursively |
+| `src/components/RuleOptions.tsx`    | Renders one rule: field, operation, value     |
+| `src/components/widgets/`           | Value inputs: text, integer, money, select    |
+| `src/api.ts`                        | Sends the query to the backend                |
+| `src/App.tsx`                       | The form, save status and JSON output         |
 
 To add a field, add its value type to `FieldValueMap` (`types.ts`), its type to `FIELD_TYPES` (`constants.ts`) and its config to `FIELDS` (`fields.ts`). TypeScript flags any missing step.

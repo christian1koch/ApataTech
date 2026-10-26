@@ -1,10 +1,10 @@
 import { useEffect, useReducer, useState, type FormEvent } from "react";
 import { saveRules } from "./api";
-import ConditionGroup from "./ConditionGroup";
-import { toPayload } from "./payload";
-import { QueryDispatchContext } from "./QueryContext";
-import { createInitialQuery, queryReducer } from "./queryReducer";
-import type { Query } from "./types";
+import ConditionGroup from "./components/ConditionGroup";
+import { toPayload } from "./query/payload";
+import { QueryDispatchContext } from "./query/QueryContext";
+import { createInitialQuery, queryReducer } from "./query/queryReducer";
+import type { Query } from "./query/types";
 
 type SaveStatus =
   | { state: "idle" }
@@ -18,7 +18,7 @@ function App() {
   const [query, dispatch] = useReducer(
     queryReducer,
     undefined,
-    createInitialQuery,
+    createInitialQuery
   );
   const [submitted, setSubmitted] = useState<Query | null>(null);
   const [status, setStatus] = useState<SaveStatus>({ state: "idle" });
@@ -28,7 +28,7 @@ function App() {
     if (status.state !== "saved") return;
     const timeout = setTimeout(
       () => setStatus({ state: "idle" }),
-      SAVED_MESSAGE_MS,
+      SAVED_MESSAGE_MS
     );
     return () => clearTimeout(timeout);
   }, [status]);
