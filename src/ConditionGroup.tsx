@@ -18,6 +18,8 @@ export default function ConditionGroup({
   const dispatch = useQueryDispatch();
   // A group can't be emptied, so its only child can't be removed
   const canRemoveChild = group.children.length > 1;
+  // Rules are numbered within their own group, skipping nested groups
+  let ruleCount = 0;
 
   return (
     <fieldset className="fieldset rounded-box border-base-300 border p-4">
@@ -68,27 +70,27 @@ export default function ConditionGroup({
           )}
         </div>
       </div>
-      <div className="mt-4 flex flex-col gap-4">
-        {group.children.map((child) =>
-          child.kind === "rule" ? (
-            <RuleOptions
-              key={child.id}
-              rule={child.rule}
-              canRemove={canRemoveChild}
-              onChange={(rule) =>
-                dispatch({ type: "updateRule", id: child.id, rule })
-              }
-              onRemove={() => dispatch({ type: "remove", id: child.id })}
-            />
-          ) : (
-            <ConditionGroup
-              key={child.id}
-              group={child}
-              canRemove={canRemoveChild}
-            />
-          )
-        )}
-      </div>
+      {/* role="list" because Safari drops list semantics once list-style
+          is removed, which Tailwind's preflight does */}
+      <ul role="list" className="mt-4 flex flex-col gap-4">
+        {group.children.map((child) => (
+          <li key={child.id}>
+            {child.kind === "rule" ? (
+              <RuleOptions
+                label={`Rule ${++ruleCount}`}
+                rule={child.rule}
+                canRemove={canRemoveChild}
+                onChange={(rule) =>
+                  dispatch({ type: "updateRule", id: child.id, rule })
+                }
+                onRemove={() => dispatch({ type: "remove", id: child.id })}
+              />
+            ) : (
+              <ConditionGroup group={child} canRemove={canRemoveChild} />
+            )}
+          </li>
+        ))}
+      </ul>
     </fieldset>
   );
 }

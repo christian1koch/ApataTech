@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, within } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import App, { SAVED_MESSAGE_MS } from "./App";
@@ -44,6 +44,25 @@ describe("submitting the query", () => {
     act(() => vi.advanceTimersByTime(SAVED_MESSAGE_MS));
 
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  });
+});
+
+describe("structure", () => {
+  test("rules are numbered groups within their own group", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole("button", { name: "Add Rule" }));
+    await user.click(screen.getByRole("button", { name: "Add Group" }));
+
+    const root = screen.getByRole("group", { name: "Query" });
+    const nested = within(root).getByRole("group", { name: "Group" });
+
+    expect(within(root).getByRole("group", { name: "Rule 2" })).toBeVisible();
+    expect(within(nested).getByRole("group", { name: "Rule 1" })).toBeVisible();
+    expect(within(nested).queryByRole("group", { name: "Rule 2" })).toBeNull();
+    // Root: two rules and the nested group
+    expect(within(root).getAllByRole("list")[0].children).toHaveLength(3);
   });
 });
 

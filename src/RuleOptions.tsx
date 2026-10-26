@@ -8,6 +8,9 @@ import type { FieldName, OperationsFor, Rule, RuleFor } from "./types";
 const toRule = <K extends FieldName>(rule: RuleFor<K>): Rule => rule as Rule;
 
 interface RuleOptionsProps<K extends FieldName> {
+  // Names the rule for assistive tech, e.g. "Rule 2", since every rule's
+  // inputs share the same visible labels
+  label: string;
   rule: RuleFor<K>;
   canRemove: boolean;
   onChange: (rule: Rule) => void;
@@ -15,6 +18,7 @@ interface RuleOptionsProps<K extends FieldName> {
 }
 
 export default function RuleOptions<K extends FieldName>({
+  label,
   rule,
   canRemove,
   onChange,
@@ -25,7 +29,8 @@ export default function RuleOptions<K extends FieldName>({
   const operations = getOperations(rule.fieldName);
 
   return (
-    <div className="flex items-start gap-2">
+    <fieldset className="flex items-start gap-2">
+      <legend className="sr-only">{label}</legend>
       <label className="floating-label">
         <select
           className="select w-fit min-w-40"
@@ -74,6 +79,6 @@ export default function RuleOptions<K extends FieldName>({
       >
         <Trash size={16} />
       </button>
-    </div>
+    </fieldset>
   );
 }
