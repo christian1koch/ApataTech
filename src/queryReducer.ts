@@ -84,18 +84,10 @@ function updateGroup(
 export function queryReducer(state: GroupNode, action: QueryAction): GroupNode {
   switch (action.type) {
     case "addRule":
-      // Insert after the last rule so rules always come before nested groups
-      return updateGroup(state, action.groupId, (group) => {
-        const firstGroupIndex = group.children.findIndex(
-          (child) => child.kind === "group"
-        );
-        const insertAt =
-          firstGroupIndex === -1 ? group.children.length : firstGroupIndex;
-        return {
-          ...group,
-          children: group.children.toSpliced(insertAt, 0, createRuleNode()),
-        };
-      });
+      return updateGroup(state, action.groupId, (group) => ({
+        ...group,
+        children: [...group.children, createRuleNode()],
+      }));
     case "addGroup":
       return updateGroup(state, action.groupId, (group) => ({
         ...group,

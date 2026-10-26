@@ -44,12 +44,11 @@ describe("addRule", () => {
     expect(kinds(state)).toEqual(["rule", "group"]);
   });
 
-  // Current behaviour; issue #5 tracks whether it should append instead
-  test("inserts the rule after the existing rules, before nested groups", () => {
+  test("appends the rule to the end of the group, after nested groups", () => {
     const { root } = nestedTree();
     const state = queryReducer(root, { type: "addRule", groupId: root.id });
 
-    expect(kinds(state)).toEqual(["rule", "rule", "group"]);
+    expect(kinds(state)).toEqual(["rule", "group", "rule"]);
   });
 
   test("ignores an id that isn't a group", () => {
