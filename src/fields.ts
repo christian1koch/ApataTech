@@ -25,12 +25,14 @@ export interface FieldConfig<K extends FieldName> {
   Widget: ComponentType<WidgetProps<FieldValueMap[K]>>;
 }
 
+// Number defaults are NaN, which the widgets show as an empty, required input,
+// so the user has to enter a value before submitting.
 // Mapped over FieldName so TS knows FIELDS[k] is a FieldConfig<k>, which ties
 // each field's Widget to its value type
 export const FIELDS: { [K in FieldName]: FieldConfig<K> } = {
   amount: {
     label: "Amount",
-    defaultValue: { amount: 0, currency: "USD" },
+    defaultValue: { amount: NaN, currency: "USD" },
     Widget: MoneyWidget,
   },
   name: { label: "Name", defaultValue: "", Widget: createTextWidget() },
@@ -50,7 +52,7 @@ export const FIELDS: { [K in FieldName]: FieldConfig<K> } = {
   },
   installments: {
     label: "Installments",
-    defaultValue: 1,
+    defaultValue: NaN,
     Widget: createIntegerWidget({ min: 1 }),
   },
 };

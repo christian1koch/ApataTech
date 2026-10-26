@@ -111,14 +111,14 @@ describe("rule fields", () => {
     const field = screen.getByRole("combobox", { name: "Field name" });
     const operation = screen.getByRole("combobox", { name: "Operation" });
 
-    expect(optionsOf(operation)).toEqual(["EQUAL", "NOT_EQUAL"]);
+    expect(optionsOf(operation)).toEqual(["is", "is not"]);
 
     await user.selectOptions(field, "amount");
     expect(optionsOf(operation)).toEqual([
-      "EQUAL",
-      "NOT_EQUAL",
-      "LESS_THAN",
-      "GREATER_THAN",
+      "is",
+      "is not",
+      "less than",
+      "greater than",
     ]);
   });
 
@@ -393,6 +393,26 @@ describe("validation", () => {
     expect(name).toBeInvalid();
     expect(fetchSpy).not.toHaveBeenCalled();
     expect(screen.queryByRole("heading", { name: "Payload" })).toBeNull();
+  });
+
+  test.each([
+    ["amount", "Amount"],
+    ["installments", "Value"],
+  ])("%s starts empty and blocks submit", async (fieldName, label) => {
+    const fetchSpy = mockFetchOk();
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Field name" }),
+      fieldName
+    );
+    const input = screen.getByRole("spinbutton", { name: label });
+    expect(input).toHaveValue(null);
+    expect(input).toBeInvalid();
+
+    await user.click(screen.getByRole("button", { name: "Submit" }));
+    expect(fetchSpy).not.toHaveBeenCalled();
   });
 
   test("rejects a malformed device IP", async () => {

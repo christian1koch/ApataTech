@@ -1,4 +1,5 @@
 import { Trash } from "lucide-react";
+import { OPERATION_LABELS } from "./constants";
 import { createRule, FIELD_NAMES, FIELDS, getOperations } from "./fields";
 import type { FieldName, OperationsFor, Rule, RuleFor } from "./types";
 
@@ -61,7 +62,9 @@ export default function RuleOptions<K extends FieldName>({
           }
         >
           {operations.map((operation) => (
-            <option key={operation}>{operation}</option>
+            <option key={operation} value={operation}>
+              {OPERATION_LABELS[operation]}
+            </option>
           ))}
         </select>
         <span>Operation</span>
