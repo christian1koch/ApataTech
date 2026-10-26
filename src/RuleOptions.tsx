@@ -9,12 +9,14 @@ const toRule = <K extends FieldName>(rule: RuleFor<K>): Rule => rule as Rule;
 
 interface RuleOptionsProps<K extends FieldName> {
   rule: RuleFor<K>;
+  canRemove: boolean;
   onChange: (rule: Rule) => void;
   onRemove: () => void;
 }
 
 export default function RuleOptions<K extends FieldName>({
   rule,
+  canRemove,
   onChange,
   onRemove,
 }: RuleOptionsProps<K>) {
@@ -23,7 +25,7 @@ export default function RuleOptions<K extends FieldName>({
   const operations = getOperations(rule.fieldName);
 
   return (
-    <div className="flex gap-2">
+    <div className="flex items-start gap-2">
       <label className="floating-label">
         <select
           className="select w-fit min-w-40"
@@ -67,6 +69,7 @@ export default function RuleOptions<K extends FieldName>({
         type="button"
         className="btn btn-error"
         aria-label="Remove rule"
+        disabled={!canRemove}
         onClick={onRemove}
       >
         <Trash size={16} />

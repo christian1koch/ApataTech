@@ -1,5 +1,10 @@
 import type { ComponentType } from "react";
-import { FIELD_TYPES, OPERATIONS, TRANSACTION_STATES } from "./constants";
+import {
+  FIELD_TYPES,
+  IPV4_PATTERN,
+  OPERATIONS,
+  TRANSACTION_STATES,
+} from "./constants";
 import type {
   FieldName,
   FieldValueMap,
@@ -8,10 +13,10 @@ import type {
   Rule,
   RuleFor,
 } from "./types";
-import IntegerWidget from "./widgets/IntegerWidget";
+import { createIntegerWidget } from "./widgets/IntegerWidget";
 import MoneyWidget from "./widgets/MoneyWidget";
 import { createSelectWidget } from "./widgets/SelectWidget";
-import TextWidget from "./widgets/TextWidget";
+import { createTextWidget } from "./widgets/TextWidget";
 import type { WidgetProps } from "./widgets/types";
 
 export interface FieldConfig<K extends FieldName> {
@@ -28,18 +33,25 @@ export const FIELDS: { [K in FieldName]: FieldConfig<K> } = {
     defaultValue: { amount: 0, currency: "USD" },
     Widget: MoneyWidget,
   },
-  name: { label: "Name", defaultValue: "", Widget: TextWidget },
-  id: { label: "ID", defaultValue: "", Widget: TextWidget },
+  name: { label: "Name", defaultValue: "", Widget: createTextWidget() },
+  id: { label: "ID", defaultValue: "", Widget: createTextWidget() },
   transaction_state: {
     label: "Transaction state",
     defaultValue: "SUCCEEDED",
     Widget: createSelectWidget(TRANSACTION_STATES),
   },
-  device_ip: { label: "Device IP", defaultValue: "", Widget: TextWidget },
+  device_ip: {
+    label: "Device IP",
+    defaultValue: "",
+    Widget: createTextWidget({
+      pattern: IPV4_PATTERN,
+      hint: "Enter an IPv4 address, e.g. 192.168.1.1",
+    }),
+  },
   installments: {
     label: "Installments",
     defaultValue: 1,
-    Widget: IntegerWidget,
+    Widget: createIntegerWidget({ min: 1 }),
   },
 };
 

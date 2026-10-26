@@ -31,17 +31,16 @@ export const createRuleNode = (): RuleNode => ({
   rule: createRule("name"),
 });
 
+// Groups are never empty: they start with a rule and their last child can't be
+// removed, so every group in the payload has at least one condition
 export const createGroup = (): GroupNode => ({
   id: crypto.randomUUID(),
   kind: "group",
   combinator: "AND",
-  children: [],
-});
-
-export const createInitialQuery = (): GroupNode => ({
-  ...createGroup(),
   children: [createRuleNode()],
 });
+
+export const createInitialQuery = createGroup;
 
 // Returns a copy of the tree with the node matching `id` replaced by the
 // result of `update`.
@@ -59,13 +58,15 @@ function updateNode(
 }
 
 // Returns a copy of the group with the node matching `id` removed at any
-// depth. The group passed in is never removed itself.
+// depth. The group passed in is never removed itself, and neither is a
+// group's last child.
 function removeNode(group: GroupNode, id: string): GroupNode {
+  const remaining = group.children.filter((child) => child.id !== id);
   return {
     ...group,
-    children: group.children
-      .filter((child) => child.id !== id)
-      .map((child) => (child.kind === "group" ? removeNode(child, id) : child)),
+    children: (remaining.length > 0 ? remaining : group.children).map(
+      (child) => (child.kind === "group" ? removeNode(child, id) : child)
+    ),
   };
 }
 
