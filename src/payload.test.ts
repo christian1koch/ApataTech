@@ -6,7 +6,7 @@ import type { Combinator, Query, Rule } from "./types";
 const rule = (id: string, data: Rule): RuleNode => ({
   id,
   kind: "rule",
-  ...data,
+  rule: data,
 });
 
 const group = (
@@ -123,16 +123,21 @@ describe("fromPayload", () => {
       kind: "group",
       combinator: "AND",
       children: [
-        { kind: "rule", fieldName: "name", operation: "EQUAL", value: "john" },
+        {
+          kind: "rule",
+          rule: { fieldName: "name", operation: "EQUAL", value: "john" },
+        },
         {
           kind: "group",
           combinator: "AND",
           children: [
-            { kind: "rule", fieldName: "id", value: "123" },
+            { kind: "rule", rule: { fieldName: "id", value: "123" } },
             {
               kind: "rule",
-              fieldName: "amount",
-              value: { amount: 10, currency: "EUR" },
+              rule: {
+                fieldName: "amount",
+                value: { amount: 10, currency: "EUR" },
+              },
             },
           ],
         },

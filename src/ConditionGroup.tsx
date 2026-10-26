@@ -68,7 +68,7 @@ export default function ConditionGroup({
           child.kind === "rule" ? (
             <RuleOptions
               key={child.id}
-              rule={child}
+              rule={child.rule}
               onChange={(rule) =>
                 dispatch({ type: "updateRule", id: child.id, rule })
               }

@@ -3,17 +3,15 @@ import type { Condition, Query } from "./types";
 
 // UI tree -> backend schema
 
-const toCondition = (node: QueryNode): Condition =>
-  node.kind === "rule"
-    ? {
-        fieldName: node.fieldName,
-        operation: node.operation,
-        value: node.value,
-      }
-    : {
-        combinator: node.combinator,
-        subConditions: node.children.map(toCondition),
-      };
+const toCondition = (node: QueryNode): Condition => {
+  if (node.kind === "group") {
+    return {
+      combinator: node.combinator,
+      subConditions: node.children.map(toCondition),
+    };
+  }
+  return node.rule;
+};
 
 export const toPayload = (root: GroupNode): Query => ({
   combinator: root.combinator,
@@ -30,13 +28,7 @@ const fromCondition = (condition: Condition): QueryNode =>
         combinator: condition.combinator,
         children: condition.subConditions.map(fromCondition),
       }
-    : {
-        id: crypto.randomUUID(),
-        kind: "rule",
-        fieldName: condition.fieldName,
-        operation: condition.operation,
-        value: condition.value,
-      };
+    : { id: crypto.randomUUID(), kind: "rule", rule: condition };
 
 export const fromPayload = (query: Query): GroupNode => ({
   id: crypto.randomUUID(),

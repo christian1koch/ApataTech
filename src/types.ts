@@ -1,41 +1,53 @@
+import type {
+  CURRENCIES,
+  FIELD_TYPES,
+  OPERATIONS,
+  TRANSACTION_STATES,
+} from "./constants";
+
 export type Combinator = "AND" | "OR";
-export type FieldName =
-	| "amount"
-	| "name"
-	| "id"
-	| "transaction_state"
-	| "device_ip"
-	| "installments";
 export type Operation = "EQUAL" | "NOT_EQUAL" | "LESS_THAN" | "GREATER_THAN";
+export type Currency = (typeof CURRENCIES)[number];
+export type TransactionState = (typeof TRANSACTION_STATES)[number];
 
 export interface Money {
-	amount: number;
-	currency: string; // TODO: Revisit to see if an enum or a type needs to be created for currency
+  amount: number;
+  currency: Currency;
 }
-export type TransactionState =
-	| "SUCCEEDED"
-	| "REJECTED"
-	| "ERROR"
-	| "TIMEOUT"
-	| "CANCELLED"
-	| "FAILED"
-	| "ABORTED";
-export type Value = string | number | Money | TransactionState; // TODO: Check a better way to conditionally check the value depending on FieldName, issue #5
 
-export interface Rule {
-	fieldName: FieldName;
-	operation: Operation;
-	value: Value;
+// Every field and the value type it holds. FIELD_TYPES and FIELDS must cover
+// the same keys, which the compiler enforces.
+export interface FieldValueMap {
+  amount: Money;
+  name: string;
+  id: string;
+  transaction_state: TransactionState;
+  device_ip: string;
+  installments: number;
 }
+
+export type FieldName = keyof FieldValueMap;
+export type FieldType = keyof typeof OPERATIONS;
+export type OperationsFor<K extends FieldName> =
+  (typeof OPERATIONS)[(typeof FIELD_TYPES)[K]][number];
+
+export interface RuleFor<K extends FieldName> {
+  fieldName: K;
+  operation: OperationsFor<K>;
+  value: FieldValueMap[K];
+}
+
+// Union of every valid rule, discriminated by fieldName
+export type Rule = { [K in FieldName]: RuleFor<K> }[FieldName];
 
 export interface Group {
-	combinator: Combinator;
-	subConditions: Condition[];
+  combinator: Combinator;
+  subConditions: Condition[];
 }
 
 export type Condition = Rule | Group;
 
 export interface Query {
-	combinator: Combinator;
-	conditions: Condition[];
+  combinator: Combinator;
+  conditions: Condition[];
 }

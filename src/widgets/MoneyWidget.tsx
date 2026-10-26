@@ -1,9 +1,8 @@
-import { CURRENCIES } from "../fields";
-import type { Money } from "../types";
+import { CURRENCIES } from "../constants";
+import type { Currency, Money } from "../types";
 import type { WidgetProps } from "./types";
 
-export default function MoneyWidget({ value, onChange }: WidgetProps) {
-  const money = value as Money;
+export default function MoneyWidget({ value, onChange }: WidgetProps<Money>) {
   return (
     <div className="flex gap-2">
       <label className="floating-label">
@@ -11,9 +10,9 @@ export default function MoneyWidget({ value, onChange }: WidgetProps) {
           type="number"
           className="input w-32"
           placeholder="Amount"
-          value={Number.isNaN(money.amount) ? "" : money.amount}
+          value={Number.isNaN(value.amount) ? "" : value.amount}
           onChange={(e) =>
-            onChange({ ...money, amount: e.target.valueAsNumber })
+            onChange({ ...value, amount: e.target.valueAsNumber })
           }
         />
         <span>Amount</span>
@@ -21,8 +20,10 @@ export default function MoneyWidget({ value, onChange }: WidgetProps) {
       <label className="floating-label">
         <select
           className="select w-24"
-          value={money.currency}
-          onChange={(e) => onChange({ ...money, currency: e.target.value })}
+          value={value.currency}
+          onChange={(e) =>
+            onChange({ ...value, currency: e.target.value as Currency })
+          }
         >
           {CURRENCIES.map((currency) => (
             <option key={currency}>{currency}</option>

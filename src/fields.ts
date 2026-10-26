@@ -1,63 +1,68 @@
-import type { FieldName, Money, Operation, TransactionState } from "./types";
+import type { ComponentType } from "react";
+import { FIELD_TYPES, OPERATIONS, TRANSACTION_STATES } from "./constants";
+import type {
+  FieldName,
+  FieldValueMap,
+  Operation,
+  OperationsFor,
+  Rule,
+  RuleFor,
+} from "./types";
+import IntegerWidget from "./widgets/IntegerWidget";
+import MoneyWidget from "./widgets/MoneyWidget";
+import { createSelectWidget } from "./widgets/SelectWidget";
+import TextWidget from "./widgets/TextWidget";
+import type { WidgetProps } from "./widgets/types";
 
-export type FieldType = "text" | "number" | "enum";
-export type WidgetType = "text" | "number" | "integer" | "money" | "select";
-
-export const OPERATIONS_BY_TYPE: Record<FieldType, readonly Operation[]> = {
-  text: ["EQUAL", "NOT_EQUAL"],
-  number: ["EQUAL", "NOT_EQUAL", "LESS_THAN", "GREATER_THAN"],
-  enum: ["EQUAL", "NOT_EQUAL"],
-};
-
-export const TRANSACTION_STATES: readonly TransactionState[] = [
-  "SUCCEEDED",
-  "REJECTED",
-  "ERROR",
-  "TIMEOUT",
-  "CANCELLED",
-  "FAILED",
-  "ABORTED",
-];
-
-export const CURRENCIES: readonly string[] = ["USD", "EUR", "GBP"];
-
-export interface FieldConfig {
+export interface FieldConfig<K extends FieldName> {
   label: string;
-  type: FieldType;
-  widget: WidgetType;
-  defaultValue: string | number | Money;
-  options?: readonly string[]; // only for "select" widgets
+  defaultValue: FieldValueMap[K];
+  Widget: ComponentType<WidgetProps<FieldValueMap[K]>>;
 }
 
-export const FIELDS: Record<FieldName, FieldConfig> = {
+// Mapped over FieldName so TS knows FIELDS[k] is a FieldConfig<k>, which ties
+// each field's Widget to its value type
+export const FIELDS: { [K in FieldName]: FieldConfig<K> } = {
   amount: {
     label: "Amount",
-    type: "number",
-    widget: "money",
     defaultValue: { amount: 0, currency: "USD" },
+    Widget: MoneyWidget,
   },
-  name: { label: "Name", type: "text", widget: "text", defaultValue: "" },
-  id: { label: "ID", type: "text", widget: "text", defaultValue: "" },
+  name: { label: "Name", defaultValue: "", Widget: TextWidget },
+  id: { label: "ID", defaultValue: "", Widget: TextWidget },
   transaction_state: {
     label: "Transaction state",
-    type: "enum",
-    widget: "select",
-    options: TRANSACTION_STATES,
     defaultValue: "SUCCEEDED",
+    Widget: createSelectWidget(TRANSACTION_STATES),
   },
-  device_ip: {
-    label: "Device IP",
-    type: "text",
-    widget: "text",
-    defaultValue: "",
-  },
+  device_ip: { label: "Device IP", defaultValue: "", Widget: TextWidget },
   installments: {
     label: "Installments",
-    type: "number",
-    widget: "integer",
     defaultValue: 1,
+    Widget: IntegerWidget,
   },
 };
 
-export const getOperations = (field: FieldName) =>
-  OPERATIONS_BY_TYPE[FIELDS[field].type];
+export const FIELD_NAMES = Object.keys(FIELDS) as FieldName[];
+
+export const getOperations = <K extends FieldName>(
+  fieldName: K
+): readonly OperationsFor<K>[] => OPERATIONS[FIELD_TYPES[fieldName]];
+
+function buildRule<K extends FieldName>(
+  fieldName: K,
+  operation?: Operation
+): RuleFor<K> {
+  const allowed = getOperations(fieldName);
+  return {
+    fieldName,
+    operation: allowed.find((op) => op === operation) ?? allowed[0],
+    value: FIELDS[fieldName].defaultValue,
+  };
+}
+
+// Builds a valid rule for `fieldName`, keeping `operation` if the field
+// supports it. buildRule is type-checked per field; the cast is only needed
+// because TS can't prove a generic RuleFor<K> is a member of the Rule union.
+export const createRule = (fieldName: FieldName, operation?: Operation) =>
+  buildRule(fieldName, operation) as Rule;
