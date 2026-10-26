@@ -1,5 +1,5 @@
 import "./App.css";
-import { useReducer, useState, type FormEvent } from "react";
+import { useEffect, useReducer, useState, type FormEvent } from "react";
 import { saveRules } from "./api";
 import ConditionGroup from "./ConditionGroup";
 import { toPayload } from "./payload";
@@ -13,6 +13,8 @@ type SaveStatus =
   | { state: "saved" }
   | { state: "error"; message: string };
 
+export const SAVED_MESSAGE_MS = 3000;
+
 function App() {
   const [query, dispatch] = useReducer(
     queryReducer,
@@ -21,6 +23,16 @@ function App() {
   );
   const [submitted, setSubmitted] = useState<Query | null>(null);
   const [status, setStatus] = useState<SaveStatus>({ state: "idle" });
+
+  // The success message hides itself; an error stays until the next submit
+  useEffect(() => {
+    if (status.state !== "saved") return;
+    const timeout = setTimeout(
+      () => setStatus({ state: "idle" }),
+      SAVED_MESSAGE_MS
+    );
+    return () => clearTimeout(timeout);
+  }, [status]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
