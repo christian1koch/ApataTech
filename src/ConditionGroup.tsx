@@ -7,13 +7,17 @@ import type { Combinator } from "./types";
 interface ConditionGroupProps {
   group: GroupNode;
   isRoot?: boolean;
+  canRemove?: boolean;
 }
 
 export default function ConditionGroup({
   group,
   isRoot = false,
+  canRemove = false,
 }: ConditionGroupProps) {
   const dispatch = useQueryDispatch();
+  // A group can't be emptied, so its only child can't be removed
+  const canRemoveChild = group.children.length > 1;
 
   return (
     <fieldset className="fieldset rounded-box border-base-300 border p-4">
@@ -56,6 +60,7 @@ export default function ConditionGroup({
               type="button"
               className="btn btn-error"
               aria-label="Remove group"
+              disabled={!canRemove}
               onClick={() => dispatch({ type: "remove", id: group.id })}
             >
               <Trash size={16} />
@@ -69,13 +74,18 @@ export default function ConditionGroup({
             <RuleOptions
               key={child.id}
               rule={child.rule}
+              canRemove={canRemoveChild}
               onChange={(rule) =>
                 dispatch({ type: "updateRule", id: child.id, rule })
               }
               onRemove={() => dispatch({ type: "remove", id: child.id })}
             />
           ) : (
-            <ConditionGroup key={child.id} group={child} />
+            <ConditionGroup
+              key={child.id}
+              group={child}
+              canRemove={canRemoveChild}
+            />
           )
         )}
       </div>
