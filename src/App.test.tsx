@@ -104,6 +104,41 @@ describe("building the query", () => {
   });
 });
 
+describe("focus after removing", () => {
+  test("moves to the rule that takes the removed one's place", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const root = getRoot();
+    const addRule = within(root).getByRole("button", { name: "Add Rule" });
+    await user.click(addRule);
+    await user.click(addRule);
+
+    await user.click(
+      within(getRule(root, 2)).getByRole("button", { name: "Remove rule" })
+    );
+
+    // The old rule 3 is now rule 2
+    expect(
+      within(getRule(root, 2)).getByRole("combobox", { name: "Field name" })
+    ).toHaveFocus();
+  });
+
+  test("moves to Add Rule when the last child is removed", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const root = getRoot();
+    await user.click(within(root).getByRole("button", { name: "Add Group" }));
+
+    await user.click(
+      within(root).getByRole("button", { name: "Remove group" })
+    );
+
+    expect(
+      within(root).getByRole("button", { name: "Add Rule" })
+    ).toHaveFocus();
+  });
+});
+
 describe("rule fields", () => {
   test("the operations depend on the field type", async () => {
     const user = userEvent.setup();
