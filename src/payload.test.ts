@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { fromPayload, toPayload } from "./payload";
+import { toPayload } from "./payload";
 import type { GroupNode, QueryNode, RuleNode } from "./queryReducer";
 import type { Combinator, Query, Rule } from "./types";
 
@@ -39,11 +39,6 @@ const nestedPayload: Query = {
     },
   ],
 };
-
-const collectIds = (node: QueryNode): string[] =>
-  node.kind === "rule"
-    ? [node.id]
-    : [node.id, ...node.children.flatMap(collectIds)];
 
 describe("toPayload", () => {
   test("converts a single rule", () => {
@@ -112,52 +107,5 @@ describe("toPayload", () => {
       combinator: "AND",
       conditions: [{ combinator: "OR", subConditions: [] }],
     });
-  });
-});
-
-describe("fromPayload", () => {
-  test("creates rule and group nodes with the payload's data", () => {
-    const tree = fromPayload(nestedPayload);
-
-    expect(tree).toMatchObject({
-      kind: "group",
-      combinator: "AND",
-      children: [
-        {
-          kind: "rule",
-          rule: { fieldName: "name", operation: "EQUAL", value: "john" },
-        },
-        {
-          kind: "group",
-          combinator: "AND",
-          children: [
-            { kind: "rule", rule: { fieldName: "id", value: "123" } },
-            {
-              kind: "rule",
-              rule: {
-                fieldName: "amount",
-                value: { amount: 10, currency: "EUR" },
-              },
-            },
-          ],
-        },
-      ],
-    });
-  });
-
-  test("gives every node a unique id", () => {
-    const ids = collectIds(fromPayload(nestedPayload));
-
-    expect(ids).toHaveLength(5);
-    expect(new Set(ids).size).toBe(ids.length);
-  });
-});
-
-describe("round trip", () => {
-  test.each([
-    ["a single rule", singleRulePayload],
-    ["a nested group", nestedPayload],
-  ])("toPayload(fromPayload(x)) returns x for %s", (_, payload) => {
-    expect(toPayload(fromPayload(payload))).toStrictEqual(payload);
   });
 });

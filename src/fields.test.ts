@@ -27,9 +27,7 @@ describe("createRule", () => {
   );
 
   test("keeps the operation when the new field supports it", () => {
-    expect(createRule("installments", "LESS_THAN").operation).toBe(
-      "LESS_THAN"
-    );
+    expect(createRule("installments", "LESS_THAN").operation).toBe("LESS_THAN");
     expect(createRule("transaction_state", "NOT_EQUAL").operation).toBe(
       "NOT_EQUAL"
     );

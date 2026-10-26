@@ -1,4 +1,3 @@
-import "./App.css";
 import { useEffect, useReducer, useState, type FormEvent } from "react";
 import { saveRules } from "./api";
 import ConditionGroup from "./ConditionGroup";
