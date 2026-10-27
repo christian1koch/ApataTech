@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Written by the backend on save
+rules.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
